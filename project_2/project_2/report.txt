@@ -1,0 +1,27 @@
+Yuxiang Zhang
+206142605
+
+a. Challenges:
+	1. Reading the project specifications detailedly and line by line was a challenge for me because I, as a person, have the bad habit of skimming through documentation and not paying close enough to details and specifics.  In the future, I will spend more time reading the documentation through at first.
+	2. I also had a tough time finding a solution that was both efficient and (I hope) easy to read/understand. I ended up settling with a progressively decremented overstatement value, that would enter different if statements according to its value.
+
+b. Test Cases:
+	1. Empty Identification ("", 100, "california")
+	2. Negative Overstatement ("property", -100, "california")
+	3. Zero Overstatement ("property", 0, "california")
+	4. Empty Location ("property", 100, "")
+	5. Overstatement < 60 ("property", 50, "california")
+	6. Overstatement = 60 ("property", 60, "california")
+	7. 60 < Overstatement < 150 outside of FL/NY ("property", 100, "california")
+	8. 60 < Overstatement < 150 in FL("property", 100, "florida")
+	9. 60 < Overstatement < 150 in NY("property", 100, "new york")
+	10. Overstatement = 150 outside of FL/NY ("property", 150, "california")
+	11. 60 < Overstatement = 150 in FL("property", 150, "florida")
+	12. 60 < Overstatement = 150 in NY("property", 150, "new york")
+	13. overstatement > 150 outside of FL/NY ("property", 200, "california")
+	14. overstatement > 150 in FL ("property", 200, "florida")
+	15. overstatement > 150 in NY ("property", 200, "new york")
+
+
+
+

@@ -1,0 +1,50 @@
+Yuxiang Zhang
+206142605
+
+1.  
+endlendl
+grendel
+
+2. 
+It prints a triangle. It is composed of #s and having 'side' layers, with the first layer having one # and the bottom layer having 'side" #s.
+
+3.
+#include <iostream>
+using namespace std;
+
+int main()
+{
+     int side;
+
+     cout << "Enter a number: ";
+     cin >> side;
+
+     for (int i = 0; i < side; i++)
+     {
+ 	 int j = i + 1;
+ 	 while(j != 0) {
+	      cout << "#";
+              j--;
+	 }
+	 cout << "\n";
+     }
+}
+
+4.
+switch(codeSection) {
+     case 281:
+          cout << "bigamy";
+          break;
+     case 321:
+     case 322:
+          cout << "selling illegal lottery tickets";
+          break;
+     case 383:
+          cout << "selling rancid butter";
+          break;
+     case 598:
+          cout << "injuring a bird in a public cemetery";
+          break;
+     default:
+          cout << "some other crime";
+}

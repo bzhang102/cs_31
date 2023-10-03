@@ -1,0 +1,25 @@
+1. Input to original.cpp in step 5:
+
+	Input:
+	How many people were surveyed? 0
+	How many of them prefer basmati rice over jasmine rice? 0
+	How many of them prefer jasmine rice over basmati rice? 0
+
+	Output:
+	nan% prefer basmati rice over jasmine rice.
+	nan% prefer jasmine rice over basmati rice.
+	More people prefer jasmine rice over basmati rice.
+	Program ended with exit code: 0
+
+2. Error introduced into logic_error.cpp:
+
+	Line 20: double pctBasmati = 10.0 * preferBasmati / numberSurveyed;
+	Changed 100.0 to 10.0
+
+3. Two errors introduced into compile_error.cpp:
+
+	Line 14: cin << numberSurveyed;
+	Changed “>>” to “<<“
+
+	Line 27: cout << pctBasmati << "% prefer basmati rice over jasmine rice." << endl
+	Removed semicolon
