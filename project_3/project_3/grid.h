@@ -1,7 +1,9 @@
 // Grid library interface
-
+#include <iostream>
 #ifndef GRID_INCLUDED
 #define GRID_INCLUDED
+
+using namespace std;
 
 const int MAXROWS = 30;
 const int MAXCOLS = 30;
