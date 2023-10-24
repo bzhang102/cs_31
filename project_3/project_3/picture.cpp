@@ -239,3 +239,4 @@ int performCommands(string commandString, char& plotChar, int& mode, int& badPos
     }
     
     return 0;
+}
