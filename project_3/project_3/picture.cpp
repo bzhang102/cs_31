@@ -8,57 +8,6 @@ const int VERT = 1;
 const int FG = 0;
 const int BG = 1;
 
-//state variables
-int currR;
-int currC;
-int currMode;
-char currChar;
-
-void plotHorizontalLine(int r, int c, int distance, char ch) {
-    //checks if plotting too high or too low
-    if(distance < 0 || r > getRows() || r < 1) {
-        return;
-    }
-    
-    while(distance >= 0) {
-        //checks if plotting within grid
-        if(c <= getCols() && c >= 1) {
-            setChar(r, c, ch);
-            cout << "here" << endl;
-        }
-        c++;
-        distance--;
-    }
-}
-
-void plotVerticalLine(int r, int c, int distance, char ch) {
-    //checks if plotting too far left or right
-    if(distance < 0 || c > getCols() || c < 1) {
-        return;
-    }
-    
-    while(distance >= 0) {
-        //checks if plotting within grid
-        if(r <= getRows() && r >= 1) {
-            setChar(r, c, ch);
-        }
-        r++;
-        distance--;
-    }
-}
-
-void plotRectangle(int r, int c, int height, int width, char ch) {
-    //checks if triangle size invalid
-    if(height < 0 || width < 0) {
-        return;
-    }
-    
-    plotHorizontalLine(r, c, width, ch);
-    plotHorizontalLine(r + height, c, width, ch);
-    plotVerticalLine(r, c, height, ch);
-    plotVerticalLine(r, c + width, height, ch);
-}
-
 bool plotLine(int r, int c, int distance, int dir, char plotChar, int fgbg) {
     //checks for valid direction
     if(dir != HORIZ && dir != VERT) {
@@ -140,52 +89,81 @@ bool plotLine(int r, int c, int distance, int dir, char plotChar, int fgbg) {
     return true;
 }
 
-//TODO
-//int processH(string commandString, char& plotChar, int& mode, int& badPos) {
-//    badPos++;
-//    
-//    return 0;
-//}
-//
-//int processV(string commandString, char& plotChar, int& mode, int& badPos) {
-//    badPos++;
-//    
-//    return 0;
-//}
-
-//Sets mode to FG and changes current character
-int processF(string commandString, char& plotChar, int& badPos) {
-    badPos++;
-    if(!isprint(commandString.at(badPos))) {
+//attempts to plot line
+int processVH(string commandString, int dir, int& pos, int& currR, int& currC, char& plotChar, int&mode) {
+    //advance pointer
+    pos++;
+    
+    //check if pointer is at end of command string
+    if(pos >= commandString.size()) {
         return 1;
     }
     
-    currMode = FG;
-    currChar = plotChar;
+    /*
+     Attempts to read next few lines:
+     Case 1: If the first char is a '-', length is not incremented
+     Case 2: One digit
+     Case 3: Two digits
+     */
+    string input;
+    int length = 0;
+    while(pos < commandString.size() && (commandString.at(pos) == '-' || isdigit(commandString.at(pos))) && length < 2) {
+        input += commandString.at(pos);
+        
+        //does not count '-' as part of two digits
+        if(commandString.at(pos) != '-') {
+            length++;
+        }
+        
+        //advance pointer
+        pos++;
+    }
+    
+    int distance = stoi(input);
+    //if plotting failed, return error code 3, else plot line
+    if(!plotLine(currR, currC, distance, dir, plotChar, mode)) {
+        return 3;
+    }
+    
+    //updates current position (r, c)
+    if(dir  == HORIZ) {
+        currC += distance;
+    } else {
+        currR += distance;
+    }
     
     return 0;
 }
 
-//Sets mode to BG and changes current character
-int processB(string commandString, char& plotChar, int& badPos) {
-    badPos++;
-    if(!isprint(commandString.at(badPos))) {
+//Sets mode to FG or BG and changes current character
+int processFB(string commandString, char& plotChar, int& mode, int newMode, int& pos) {
+    //advance pointer
+    pos++;
+    
+    //check if pointer is at end of command string
+    if(pos == commandString.size()) {
         return 1;
     }
     
-    currMode = BG;
-    currChar = plotChar;
+    //check if plotChar is plottable
+    if(!isprint(commandString.at(pos))) {
+        return 1;
+    }
+    
+    //update mode and plotChar
+    mode = newMode;
+    plotChar = commandString.at(pos);
     
     return 0;
 }
 
 //clears board and sets variables to default
-int processC() {
+int processC(int& r, int& c, char& plotChar, int& mode) {
     clearGrid();
-    currR = 1;
-    currC = 1;
-    currChar = '*';
-    currMode = FG;
+    r = 1;
+    c = 1;
+    plotChar = '*';
+    mode = FG;
     
     return 0;
 }
@@ -193,50 +171,75 @@ int processC() {
 //function implementation
 int performCommands(string commandString, char& plotChar, int& mode, int& badPos) {
     //checks if character is plotable and modes are valid
-    if(!isprint(plotChar) || mode != FG || mode != BG) {
+    if(!isprint(plotChar) || (mode != FG && mode != BG)) {
         return 2;
     }
     
-    //sets variables to default
-    currR = 1;
-    currC = 1;
-    currMode = mode;
+    //sets position to default
+    int currR = 1;
+    int currC = 1;
     
-    char curr;
     int state = 0;
+    char curr = ' ';
     
+    int pos = 0;
+    int commandPos = 0;
     //reads and executes command string
-    while(badPos != commandString.size()) {
-        curr = tolower(commandString.at(badPos));
+    while(pos < commandString.size()) {
+        curr = tolower(commandString.at(pos));
+        commandPos = pos;
         
         switch(curr) {
             case 'h':
-                state = processH(commandString, plotChar, mode, badPos);
+                state = processVH(commandString, HORIZ, pos, currR, currC, plotChar, mode);
                 break;
             case 'v':
-                state = processV(commandString, plotChar, mode, badPos);
+                state = processVH(commandString, VERT, pos, currR, currC, plotChar, mode);
                 break;
             case 'f':
-                state = processF(commandString, plotChar, badPos);
+                state = processFB(commandString, plotChar, mode, FG, pos);
                 break;
             case 'b':
-                state = processB(commandString, plotChar, badPos);
+                state = processFB(commandString, plotChar, mode, BG, pos);
                 break;
             case 'c':
-                state = processC();
+                state = processC(currR, currC, plotChar, mode);
+                pos++;
                 break;
             default:
                 state = 1;
         }
         
         //if in error state, return error code
-        if(state != 0) {
+        if(state != 0 && state != 3) {
+            badPos = pos;
             return state;
         }
         
-        //move pointer to next character
-        badPos++;
+        
+        if(state == 3) {
+            badPos = commandPos;
+            return state;
+        }
     }
     
     return 0;
 }
+
+int main()
+    {
+        setSize(12, 15);
+        assert(plotLine(3, 5, 2, HORIZ, '@', FG));
+        for (int c = 5; c <= 7; c++)
+            assert(getChar(3, c) == '@');
+        assert(getChar(3, 8) == ' ');
+        clearGrid();
+        char pc = '%';
+        int m = FG;
+        int bad = 999;
+
+        assert(performCommands("H4V3V-1H-9", pc, m, bad) == 3  &&  bad == 7);
+    draw();
+        cout << "All tests succeeded." << endl;
+    }
+
