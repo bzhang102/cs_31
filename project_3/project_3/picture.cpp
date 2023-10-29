@@ -161,7 +161,7 @@ bool processVH(string commandString, int dir, int& pos, int& currR, int& currC, 
         //advance pointer
         pos++;
     }
-
+    
     //parse string parameter to int
     int distance = stoi(input);
     //if plotting failed, return false, else plot line
@@ -175,7 +175,7 @@ bool processVH(string commandString, int dir, int& pos, int& currR, int& currC, 
     } else {
         currR += distance;
     }
-
+    
     return true;
 }
 
@@ -190,11 +190,11 @@ int performCommands(string commandString, char& plotChar, int& mode, int& badPos
     if(!isValidCommandString(commandString, badPos)) {
         return 1;
     }
-
+    
     //sets position to default
     int currR = 1;
     int currC = 1;
-
+    
     char curr = ' ';
     int pos = 0;
     int command = 0;
@@ -203,7 +203,7 @@ int performCommands(string commandString, char& plotChar, int& mode, int& badPos
     while(pos < commandString.size()) {
         curr = tolower(commandString.at(pos));
         command = pos;
-
+        
         switch(curr) {
             case 'h':
                 if(!processVH(commandString, HORIZ, pos, currR, currC, plotChar, mode)) {
@@ -220,7 +220,7 @@ int performCommands(string commandString, char& plotChar, int& mode, int& badPos
             case 'f':
                 //advance pointer to read parameter
                 pos++;
-
+                
                 //update mode and plotChar
                 mode = FG;
                 plotChar = commandString.at(pos);
@@ -231,10 +231,10 @@ int performCommands(string commandString, char& plotChar, int& mode, int& badPos
             case 'b':
                 //advance pointer to read parameter
                 pos++;
-
+                
                 //update mode and plotChar
                 mode = BG;
-                plotChar = commandString.at(pos);  
+                plotChar = commandString.at(pos);
                 
                 //advance pointer to read next command char
                 pos++;
@@ -250,29 +250,86 @@ int performCommands(string commandString, char& plotChar, int& mode, int& badPos
                 //advance pointer to read next command char
                 pos++;
                 break;
-            
-            //no default included because other cases would not have passed syntax check
+                
+                //no default included because other cases would not have passed syntax check
         }
     }
-
+    
     return 0;
 }
 
-
-int main()
-{
-    setSize(12, 15);
-    assert(plotLine(3, 5, 2, HORIZ, '@', FG));
-    for (int c = 5; c <= 7; c++)
-        assert(getChar(3, c) == '@');
-    assert(getChar(3, 8) == ' ');
-    clearGrid();
-    char pc = '%';
-    int m = FG;
+//test cases
+int main() {
+    //testplotLine()
+    setSize(20, 15);
+    //valid
+    assert(plotLine(1, 1, 10, HORIZ, '*', FG) == true);
+    assert(plotLine(10, 10, 0, HORIZ, '*', FG) == true);
+    assert(plotLine(20, 15, -10, HORIZ, '*', FG) == true);
+    //invalid
+    assert(!plotLine(-1, 1, 10, HORIZ, '*', FG));
+    assert(!plotLine(1, -1, 10, HORIZ, '*', FG));
+    assert(!plotLine(20, 15, 10, HORIZ, '*', FG));
+    assert(!plotLine(20, 15, 10, VERT, '*', FG));
+    assert(!plotLine(1, 1, 10, 10, '*', FG));
+    assert(!plotLine(1, 1, 10, HORIZ, '*', 10));
+    assert(!plotLine(1, 1, 10, HORIZ, '\n', FG));
+    
+    draw();
+    
+    //test isValidCommandString()
+    int badPos = 999;
+    //valid
+    assert(isValidCommandString("H25H-10CF&b*v01", badPos) == true && badPos == 999);
+    assert(isValidCommandString("", badPos) && badPos == 999);
+    //invalid
+    assert(!isValidCommandString("F#H+25H?V3!", badPos) && badPos == 3);
+    assert(!isValidCommandString("B@H", badPos) && badPos == 3);
+    assert(!isValidCommandString("C12 ", badPos) && badPos == 1);
+    assert(!isValidCommandString("Q3V4#", badPos) && badPos == 0);
+    assert(!isValidCommandString("V03C H123#", badPos) && badPos == 4);
+    assert(!isValidCommandString("H5H-1-2", badPos) && badPos == 5);
+    assert(!isValidCommandString("FH8", badPos) && badPos == 2);
+    assert(!isValidCommandString("H25,H-10", badPos) && badPos == 3);
+    assert(!isValidCommandString("H\n", badPos) && badPos == 1);
+    assert(!isValidCommandString("f\n", badPos) && badPos == 1);
+    
+    //test performCommands()
     int bad = 999;
-      // A successful command string should not change bad
-    assert(performCommands("V2", pc, m, bad) == 0  &&  getChar(3, 1) == '%'  &&  bad == 999);
-    assert(performCommands("V2H2Q2", pc, m, bad) == 1  &&  bad == 4);
-    assert(performCommands("H4V3V-1H-9", pc, m, bad) == 3  &&  bad == 7);
-    cout << "All tests succeeded." << endl;
+    char pc = '*';
+    int m = FG;
+    setSize(12, 15);
+    
+    //valid
+    assert(performCommands("V2", pc, m, bad) == 0 && bad == 999);
+    assert(performCommands("b^H14F&V11H-03", pc, m, bad) == 0 && bad == 999);
+    assert(performCommands("", pc, m , bad) == 0 && bad == 999);
+    //code1
+    assert(performCommands("F#H+25H?V3!", pc, m, bad) == 1 && bad == 3);
+    assert(performCommands("B@H", pc, m, bad) == 1 && bad == 3);
+    assert(performCommands("C12 ", pc, m, bad) == 1 && bad == 1);
+    assert(performCommands("Q3V4#", pc, m, bad) == 1 && bad == 0);
+    assert(performCommands("V03C H123#", pc, m, bad) == 1 && bad == 4);
+    assert(performCommands("H5H-1-2", pc, m, bad) == 1 && bad == 5);
+    assert(performCommands("FH8", pc, m, bad) == 1 && bad == 2);
+    assert(performCommands("H25,H-10", pc, m, bad) == 1 && bad == 3);
+    assert(performCommands("H\n", pc, m, bad) && bad == 1);
+    assert(performCommands("f\n", pc, m, bad) && bad == 1);
+    //code2
+    bad = 999;
+    pc = '\n';
+    assert(performCommands("", pc, m, bad) == 2 && bad == 999);
+    pc = '*';
+    m = 10;
+    assert(performCommands("", pc, m, bad) == 2 && bad == 999);
+    m = FG;
+    //code3
+    assert(performCommands("H-1", pc, m, bad) == 3 && bad == 0);
+    assert(performCommands("V-1", pc, m, bad) == 3 && bad == 0);
+    assert(performCommands("H20", pc, m, bad) == 3 && bad == 0);
+    assert(performCommands("V20", pc, m, bad) == 3 && bad == 0);
+    
+    draw();
+    cout << "All test cases passed" << endl;
+    return 0;
 }

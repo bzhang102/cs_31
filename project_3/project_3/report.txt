@@ -2,28 +2,142 @@ Yuxiang Zhang
 206142605
 
 a. Obstacles:
-1. While testing my Phase 1 code, I encountered a bug where my code would always fail to print the last character of the line, while for another test case, it did. I discovered that this was because the test case that passed went off the edge of the grid, and the extra character would not have been printed either way. The root cause of this bug was a substitution of a <= with <.
-2. While working on the plotLine method for Phase 2, I struggled to think of an intuitive, clean way to organize the logic required to handle all the cases (different directions, fgbg, and +/- distances). I ended up writing comments to both help myself and any reader understand what case each section of code dealt with.
-3. When I thought I had finalized a version of my Phase 3 Code, I realized that it missed one important part of the spec: it had to check the validity of the entire command string first, then proceed to execute it, or attempt to execute it. However, fixing this actually made my code more straightforward and easier to understand as it checked for syntax errors first instead of trying to handle them as the program execution proceeded.
+	1. While testing my Phase 1 code, I encountered a bug where my code would always fail to print the last character of the line, while for another test case, it did. I discovered that this was because the test case that passed went off the edge of the grid, and the extra character would not have been printed either way. The root cause of this bug was a substitution of a <= with <.
+	2. While working on the plotLine method for Phase 2, I struggled to think of an intuitive, clean way to organize the logic required to handle all the cases (different directions, fgbg, and +/- distances). I ended up writing comments to both help myself and any reader understand what case each section of code dealt with.
+	3. When I thought I had finalized a version of my Phase 3 Code, I realized that it missed one important part of the spec: it had to check the validity of the entire command string first, then proceed to execute it, or attempt to execute it, since syntax errors take precedence over plotting errors. However, fixing this actually made my code more straightforward and easier to understand as it checked for syntax errors first instead of trying to handle them as the program execution proceeded.
 
 b. Description:
-1. PlotLine:
+	1. PlotLine:
+		i. Checks for valid inputs
+		ii. Checks for valid mode
+		iii. Checks if starting point is in bounds
+		iv. Checks if plotChar is print
+		v. Splits into cases depending on whether HORIZ or VERT, but generally...
 
-2. PerformCommands:
+			finds endpoint and checks if it's within the grid
+			repeatedly:
+				plots point depending on what the mode is
+				moves pen towards endpoint			
+			plots endpoint
 
+	2. PerformCommands:
+		i. Checks if plotChar is print, and if mode is valid, returning code 2 if not
+		ii. Checks if commandString syntax is correct as follows...
+			
+			repeatedly:
+				reads next character in commandString and converts to lowercase
+				if the next command is...
+					'h' or 'v': verifies that a 1 or 2 digit number follows
+					'f' or 'b': verifies that following character is print
+					'c': moves on
+				anything else is considered invalid
+		
+		iii. Goes over commandString and attempts to perform commands as follows...
+			
+			repeatedly:
+				reads next character in commandString and converts to lowercase
+				if the next command is...
+					'h' or 'v': parses numerical parameter then calls plotLine() with it
+					'f' or 'b': changes mode and sets character to parameter
+					'c': clears grid and resets defaults
+				returns corresponding error code if anything bad happens
 
 c. Test Cases:
-1. plotLine():
-    
-2. isValidCommandString()
-    assert(isValidCommandString("F#H+25H?V3!", badPos) == false && badPos == 3);
-    assert(isValidCommandString("B@H", badPos) == false && badPos == 3);
-    assert(isValidCommandString("C12 ", badPos) == false && badPos == 1);
-    assert(isValidCommandString("Q3V4#", badPos) == false && badPos == 0);
-    assert(isValidCommandString("V03C H123#", badPos) == false && badPos == 4);
-    assert(isValidCommandString("H5H-1-2", badPos) == false && badPos == 5);
-    assert(isValidCommandString("FH8", badPos) == false && badPos == 2);
-    assert(isValidCommandString("FH8", badPos) == false && badPos == 2);
-    assert(isValidCommandString("H25,H-10", badPos) == false && badPos == 3);
-    assert(isValidCommandString("H25 H-10", badPos) == false && badPos == 3);
-    assert(isValidCommandString("H25H-10CF&b*v01", badPos) == true && badPos == 999);
+	1. plotLine() (Given Grid Size 20,15):
+		Valid:
+			Positive Distance: assert(plotLine(1, 1, 10, HORIZ, '*', FG) == true);
+			Zero Distance: assert(plotLine(10, 10, 0, HORIZ, '*', FG) == true);
+			Negative Distance: assert(plotLine(20, 15, -10, HORIZ, '*', FG) == true);
+		Invalid:
+	    		Out of bounds left: assert(!plotLine(-1, 1, 10, HORIZ, '*', FG));
+	    		Out of bounds top: assert(!plotLine(1, -1, 10, HORIZ, '*', FG));
+		    	Out of bounds right: assert(!plotLine(20, 15, 10, HORIZ, '*', FG));
+    			Out of bounds bottom: assert(!plotLine(20, 15, 10, VERT, '*', FG));
+  			Invalid direction: assert(!plotLine(1, 1, 10, 10, '*', FG));
+		   	Invalid mode: assert(!plotLine(1, 1, 10, HORIZ, '*', 10));
+    			Invalid plotChar: assert(!plotLine(1, 1, 10, HORIZ, '\n', FG));
+		After Calling draw():
+			            111111
+ 			   123456789012345
+			  +---------------+
+ 			 1|***********    |
+ 			 2|               |
+			 3|               |
+ 			 4|               |
+ 			 5|               |
+ 			 6|               |
+ 			 7|               |
+ 			 8|               |
+ 			 9|               |
+			10|         *     |
+			11|               |
+			12|               |
+			13|               |
+			14|               |
+			15|               |
+			16|               |
+			17|               |
+			18|               |
+			19|               |
+			20|    ***********|
+			  +---------------+
+		
+		
+	2. isValidCommandString() (An important helper function I decided to 	implement and test with badPos at 999):
+		Valid:
+    			Typical commandString: assert(isValidCommandString("H25H-10CF&b*v01", badPos) == true && badPos == 999);
+			Empty commandString: assert(isValidCommandString("", badPos) && badPos == 999);
+		Invalid:
+			Bad param in H: assert(!isValidCommandString("F#H+25H?V3!", badPos) && badPos == 3);
+			No param in H: assert(!isValidCommandString("B@H", badPos) && badPos == 3);
+    			Extra param: assert(!isValidCommandString("C12 ", badPos) && badPos == 1);
+    			Bad command (letter): assert(!isValidCommandString("Q3V4#", badPos) && badPos == 0);
+	    		Space insertion: assert(!isValidCommandString("V03C H123#", badPos) && badPos == 4);
+    			Extra param after H: assert(!isValidCommandString("H5H-1-2", badPos) && badPos == 5);
+    			Missing param that shifted params: assert(!isValidCommandString("FH8", badPos) && badPos == 2);
+	    		Comma insertion: assert(!isValidCommandString("H25,H-10", badPos) && badPos == 3);
+			Non-plottable character after H: assert(!isValidCommandString("H\n", badPos) && badPos == 1);
+			Non-plottable character after F: assert(!isValidCommandString("f\n", badPos) && badPos == 1);
+
+	3. performCommands() (bad at 999, pc at '*', m at FG, Given Grid Size 12,15):
+		Valid:
+			Single command: assert(performCommands("V2", pc, m, bad) == 0 && bad == 999);
+			Multiple commands: assert(performCommands("b^H14F&V11H-03", pc, m, bad) == 0 && bad == 999);
+			Empty command: assert(performCommands("", pc, m , bad) == 0 && bad == 999);
+		Code 1: 
+	        	Bad param in H: assert(performCommands("F#H+25H?V3!", pc, m, bad) == 1 && bad == 3);
+			No param in H: assert(performCommands("B@H", pc, m, bad) == 1 && bad == 3);
+    			Extra param: assert(performCommands("C12 ", pc, m, bad) == 1 && bad == 1);
+    			Bad command (letter): assert(performCommands("Q3V4#", pc, m, bad) == 1 && bad == 0);
+	    		Space insertion: assert(performCommands("V03C H123#", pc, m, bad) == 1 && bad == 4);
+    			Extra param after H: assert(performCommands("H5H-1-2", pc, m, bad) == 1 && bad == 5);
+    			Missing param that shifted params: assert(performCommands("FH8", pc, m, bad) == 1 && bad == 2);
+	    		Comma insertion: assert(performCommands("H25,H-10", pc, m, bad) == 1 && bad == 3);
+			Unprintable character after H: assert(performCommands("H\n", pc, m, bad) == 1 && bad == 1);
+			Unprintable character after F: assert(performCommands("f\n", pc, m, bad) == 1 && bad == 1);
+		Code 2: (pc and FG are modified)
+			Unprintable character passed as plotChar: assert(performCommands("", '\n', m, bad) == 2 && bad == 999);
+			Bad mode passed as mode: assert(performCommands("", pc, 10, bad) == 2 && bad == 999);
+		Code 3:
+			Out of bounds left: assert(performCommands("H-1", pc, m, bad) == 3 && bad == 0);
+	    		Out of bounds top: assert(performCommands("V-1", pc, m, bad) == 3 && bad == 0);
+		    	Out of bounds right: assert(performCommands("H20", pc, m, bad) == 3 && bad == 0);
+    			Out of bounds bottom: assert(performCommands("V20", pc, m, bad) == 3 && bad == 0);
+
+		After calling draw():
+ 			            111111
+			   123456789012345
+			  +---------------+
+			 1|*^^^^^^^^^^^^^&|
+			 2|*             &|
+			 3|*             &|
+			 4|              &|
+			 5|              &|
+			 6|              &|
+			 7|              &|
+			 8|              &|
+			 9|              &|
+			10|              &|
+			11|              &|
+			12|           &&&&|
+			  +---------------+
