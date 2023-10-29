@@ -1,6 +1,10 @@
 #include "grid.h"
 #include <cctype>
 #include <cassert>
+#include <string>
+#include <iostream>
+
+using namespace std;
 
 const int HORIZ = 0;
 const int VERT = 1;
@@ -252,4 +256,23 @@ int performCommands(string commandString, char& plotChar, int& mode, int& badPos
     }
 
     return 0;
+}
+
+
+int main()
+{
+    setSize(12, 15);
+    assert(plotLine(3, 5, 2, HORIZ, '@', FG));
+    for (int c = 5; c <= 7; c++)
+        assert(getChar(3, c) == '@');
+    assert(getChar(3, 8) == ' ');
+    clearGrid();
+    char pc = '%';
+    int m = FG;
+    int bad = 999;
+      // A successful command string should not change bad
+    assert(performCommands("V2", pc, m, bad) == 0  &&  getChar(3, 1) == '%'  &&  bad == 999);
+    assert(performCommands("V2H2Q2", pc, m, bad) == 1  &&  bad == 4);
+    assert(performCommands("H4V3V-1H-9", pc, m, bad) == 3  &&  bad == 7);
+    cout << "All tests succeeded." << endl;
 }
