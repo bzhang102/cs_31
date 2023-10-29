@@ -8,6 +8,7 @@ const int VERT = 1;
 const int FG = 0;
 const int BG = 1;
 
+//function implementation
 bool plotLine(int r, int c, int distance, int dir, char plotChar, int fgbg) {
     //checks for valid direction
     if(dir != HORIZ && dir != VERT) {
@@ -89,83 +90,89 @@ bool plotLine(int r, int c, int distance, int dir, char plotChar, int fgbg) {
     return true;
 }
 
-//attempts to plot line
-int processVH(string commandString, int dir, int& pos, int& currR, int& currC, char& plotChar, int&mode) {
-    //advance pointer
-    pos++;
+//checks if command string is syntatically valid
+bool isValidCommandString(string commandString, int& badPos) {
+    int index = 0;
+    char curr;
     
-    //check if pointer is at end of command string
-    if(pos >= commandString.size()) {
-        return 1;
+    while(index < commandString.size()) {
+        int length;
+        curr = tolower(commandString.at(index));
+        
+        switch(curr) {
+            case 'h':
+            case 'v':
+                length = 0;
+                index++;
+                
+                //skips first character if it's a negative sign
+                if(index < commandString.size() && commandString.at(index) == '-') {
+                    index++;
+                }
+                
+                //checks if next two characters are digits
+                while(index < commandString.size() && isdigit(commandString.at(index)) && length < 2) {
+                    index++;
+                    length++;
+                }
+                
+                if(length == 0) {
+                    badPos = index;
+                    return false;
+                }
+                
+                break;
+            case 'f':
+            case 'b':
+                index++;
+                //if out of bounds or unprintable return false
+                if(index >= commandString.size() || !isprint(commandString.at(index))) {
+                    badPos = index;
+                    return false;
+                }
+                index++;
+                break;
+            case 'c':
+                index++;
+                break;
+            default:
+                badPos = index;
+                return false;
+        }
     }
     
-    /*
-     Attempts to read next few lines:
-     Case 1: If the first char is a '-', length is not incremented
-     Case 2: One digit
-     Case 3: Two digits
-     */
+    return true;
+}
+
+//attempts to plot line
+bool processVH(string commandString, int dir, int& pos, int& currR, int& currC, char& plotChar, int&mode) {
+    //advance pointer to read parameter
+    pos++;
+    
+    //read parameter
     string input;
-    int length = 0;
-    while(pos < commandString.size() && (commandString.at(pos) == '-' || isdigit(commandString.at(pos))) && length < 2) {
+    while(pos < commandString.size() && (isdigit(commandString.at(pos)) || commandString.at(pos) == '-')) {
         input += commandString.at(pos);
-        
-        //does not count '-' as part of two digits
-        if(commandString.at(pos) != '-') {
-            length++;
-        }
         
         //advance pointer
         pos++;
     }
-    
+
+    //parse string parameter to int
     int distance = stoi(input);
-    //if plotting failed, return error code 3, else plot line
+    //if plotting failed, return false, else plot line
     if(!plotLine(currR, currC, distance, dir, plotChar, mode)) {
-        return 3;
+        return false;
     }
     
-    //updates current position (r, c)
-    if(dir  == HORIZ) {
+    //update r/c position
+    if(dir == HORIZ) {
         currC += distance;
     } else {
         currR += distance;
     }
-    
-    return 0;
-}
 
-//Sets mode to FG or BG and changes current character
-int processFB(string commandString, char& plotChar, int& mode, int newMode, int& pos) {
-    //advance pointer
-    pos++;
-    
-    //check if pointer is at end of command string
-    if(pos == commandString.size()) {
-        return 1;
-    }
-    
-    //check if plotChar is plottable
-    if(!isprint(commandString.at(pos))) {
-        return 1;
-    }
-    
-    //update mode and plotChar
-    mode = newMode;
-    plotChar = commandString.at(pos);
-    
-    return 0;
-}
-
-//clears board and sets variables to default
-int processC(int& r, int& c, char& plotChar, int& mode) {
-    clearGrid();
-    r = 1;
-    c = 1;
-    plotChar = '*';
-    mode = FG;
-    
-    return 0;
+    return true;
 }
 
 //function implementation
@@ -175,71 +182,74 @@ int performCommands(string commandString, char& plotChar, int& mode, int& badPos
         return 2;
     }
     
+    //checks syntax
+    if(!isValidCommandString(commandString, badPos)) {
+        return 1;
+    }
+
     //sets position to default
     int currR = 1;
     int currC = 1;
-    
-    int state = 0;
+
     char curr = ' ';
-    
     int pos = 0;
-    int commandPos = 0;
+    int command = 0;
+    
     //reads and executes command string
     while(pos < commandString.size()) {
         curr = tolower(commandString.at(pos));
-        commandPos = pos;
-        
+        command = pos;
+
         switch(curr) {
             case 'h':
-                state = processVH(commandString, HORIZ, pos, currR, currC, plotChar, mode);
+                if(!processVH(commandString, HORIZ, pos, currR, currC, plotChar, mode)) {
+                    badPos = command;
+                    return 3;
+                }
                 break;
             case 'v':
-                state = processVH(commandString, VERT, pos, currR, currC, plotChar, mode);
+                if(!processVH(commandString, VERT, pos, currR, currC, plotChar, mode)) {
+                    badPos = command;
+                    return 3;
+                }
                 break;
             case 'f':
-                state = processFB(commandString, plotChar, mode, FG, pos);
-                break;
-            case 'b':
-                state = processFB(commandString, plotChar, mode, BG, pos);
-                break;
-            case 'c':
-                state = processC(currR, currC, plotChar, mode);
+                //advance pointer to read parameter
+                pos++;
+
+                //update mode and plotChar
+                mode = FG;
+                plotChar = commandString.at(pos);
+                
+                //advance pointer to read next command char
                 pos++;
                 break;
-            default:
-                state = 1;
-        }
-        
-        //if in error state, return error code
-        if(state != 0 && state != 3) {
-            badPos = pos;
-            return state;
-        }
-        
-        
-        if(state == 3) {
-            badPos = commandPos;
-            return state;
+            case 'b':
+                //advance pointer to read parameter
+                pos++;
+
+                //update mode and plotChar
+                mode = BG;
+                plotChar = commandString.at(pos);  
+                
+                //advance pointer to read next command char
+                pos++;
+                break;
+            case 'c':
+                //clear and reset to defaults
+                clearGrid();
+                currR = 1;
+                currC = 1;
+                plotChar = '*';
+                mode = FG;
+                
+                //advance pointer to read next command char
+                pos++;
+                break;
+            
+            //no default included because other cases would not have passed syntax check
         }
     }
-    
+
     return 0;
 }
-
-int main()
-    {
-        setSize(12, 15);
-        assert(plotLine(3, 5, 2, HORIZ, '@', FG));
-        for (int c = 5; c <= 7; c++)
-            assert(getChar(3, c) == '@');
-        assert(getChar(3, 8) == ' ');
-        clearGrid();
-        char pc = '%';
-        int m = FG;
-        int bad = 999;
-
-        assert(performCommands("H4V3V-1H-9", pc, m, bad) == 3  &&  bad == 7);
-    draw();
-        cout << "All tests succeeded." << endl;
-    }
-

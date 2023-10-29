@@ -2,9 +2,28 @@ Yuxiang Zhang
 206142605
 
 a. Obstacles:
-1. While testing my Phase 1 code, I encountered a bug where my code would always fail to print the last character of the line, while for another test case, it did. I discovered that this was because the test case that passed went off the edge of the grid, and the extra character would not have been printed either way. The root cause of this bug was a substitution of a <= with a <.
+1. While testing my Phase 1 code, I encountered a bug where my code would always fail to print the last character of the line, while for another test case, it did. I discovered that this was because the test case that passed went off the edge of the grid, and the extra character would not have been printed either way. The root cause of this bug was a substitution of a <= with <.
 2. While working on the plotLine method for Phase 2, I struggled to think of an intuitive, clean way to organize the logic required to handle all the cases (different directions, fgbg, and +/- distances). I ended up writing comments to both help myself and any reader understand what case each section of code dealt with.
+3. When I thought I had finalized a version of my Phase 3 Code, I realized that it missed one important part of the spec: it had to check the validity of the entire command string first, then proceed to execute it, or attempt to execute it. However, fixing this actually made my code more straightforward and easier to understand as it checked for syntax errors first instead of trying to handle them as the program execution proceeded.
 
 b. Description:
+1. PlotLine:
+
+2. PerformCommands:
+
 
 c. Test Cases:
+1. plotLine():
+    
+2. isValidCommandString()
+    assert(isValidCommandString("F#H+25H?V3!", badPos) == false && badPos == 3);
+    assert(isValidCommandString("B@H", badPos) == false && badPos == 3);
+    assert(isValidCommandString("C12 ", badPos) == false && badPos == 1);
+    assert(isValidCommandString("Q3V4#", badPos) == false && badPos == 0);
+    assert(isValidCommandString("V03C H123#", badPos) == false && badPos == 4);
+    assert(isValidCommandString("H5H-1-2", badPos) == false && badPos == 5);
+    assert(isValidCommandString("FH8", badPos) == false && badPos == 2);
+    assert(isValidCommandString("FH8", badPos) == false && badPos == 2);
+    assert(isValidCommandString("H25,H-10", badPos) == false && badPos == 3);
+    assert(isValidCommandString("H25 H-10", badPos) == false && badPos == 3);
+    assert(isValidCommandString("H25H-10CF&b*v01", badPos) == true && badPos == 999);
