@@ -263,9 +263,13 @@ int main() {
     //testplotLine()
     setSize(20, 15);
     //valid
-    assert(plotLine(1, 1, 10, HORIZ, '*', FG) == true);
-    assert(plotLine(10, 10, 0, HORIZ, '*', FG) == true);
-    assert(plotLine(20, 15, -10, HORIZ, '*', FG) == true);
+    assert(plotLine(1, 1, 10, HORIZ, '*', FG));
+    assert(plotLine(1, 1, 10, VERT, '*', FG));
+    assert(plotLine(10, 10, 0, HORIZ, '*', FG));
+    assert(plotLine(12, 10, 0, HORIZ, '*', FG));
+    assert(plotLine(20, 15, -10, HORIZ, '*', FG));
+    assert(plotLine(20, 15, -10, VERT, '*', BG));
+    assert(plotLine(20, 15, -10, VERT, '&', BG));
     //invalid
     assert(!plotLine(-1, 1, 10, HORIZ, '*', FG));
     assert(!plotLine(1, -1, 10, HORIZ, '*', FG));
@@ -280,7 +284,7 @@ int main() {
     //test isValidCommandString()
     int badPos = 999;
     //valid
-    assert(isValidCommandString("H25H-10CF&b*v01", badPos) == true && badPos == 999);
+    assert(isValidCommandString("H25H-10CF&b*v01", badPos) && badPos == 999);
     assert(isValidCommandString("", badPos) && badPos == 999);
     //invalid
     assert(!isValidCommandString("F#H+25H?V3!", badPos) && badPos == 3);

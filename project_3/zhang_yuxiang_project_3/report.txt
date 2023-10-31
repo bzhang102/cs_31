@@ -45,9 +45,13 @@ b. Description:
 c. Test Cases:
 	1. plotLine() (Given Grid Size 20,15):
 		Valid:
-			Positive Distance: assert(plotLine(1, 1, 10, HORIZ, '*', FG) == true);
-			Zero Distance: assert(plotLine(10, 10, 0, HORIZ, '*', FG) == true);
-			Negative Distance: assert(plotLine(20, 15, -10, HORIZ, '*', FG) == true);
+			Positive across: assert(plotLine(1, 1, 10, HORIZ, '*', FG));
+			Positive down: assert(plotLine(1, 1, 10, VERT, '*', FG));
+			Zero across: assert(plotLine(10, 10, 0, HORIZ, '*', FG));
+			Zero down: assert(plotLine(12, 10, 0, HORIZ, '*', FG));
+			Negative across: assert(plotLine(20, 15, -10, HORIZ, '*', FG));
+			Negative down: assert(plotLine(20, 15, -10, VERT, '*', BG));
+			BG Plot (shouldn't modify anything): assert(plotLine(20, 15, -10, VERT, '&', BG));
 		Invalid:
 	    		Out of bounds left: assert(!plotLine(-1, 1, 10, HORIZ, '*', FG));
 	    		Out of bounds top: assert(!plotLine(1, -1, 10, HORIZ, '*', FG));
@@ -58,27 +62,27 @@ c. Test Cases:
     			Invalid plotChar: assert(!plotLine(1, 1, 10, HORIZ, '\n', FG));
 		After Calling draw():
 			            111111
- 			   123456789012345
+			   123456789012345
 			  +---------------+
- 			 1|***********    |
- 			 2|               |
-			 3|               |
- 			 4|               |
- 			 5|               |
- 			 6|               |
- 			 7|               |
- 			 8|               |
- 			 9|               |
-			10|         *     |
-			11|               |
-			12|               |
-			13|               |
-			14|               |
-			15|               |
-			16|               |
-			17|               |
-			18|               |
-			19|               |
+			 1|***********    |
+			 2|*              |
+			 3|*              |
+			 4|*              |
+			 5|*              |
+			 6|*              |
+			 7|*              |
+			 8|*              |
+			 9|*              |
+			10|*        *    *|
+			11|*             *|
+			12|         *    *|
+			13|              *|
+			14|              *|
+			15|              *|
+			16|              *|
+			17|              *|
+			18|              *|
+			19|              *|
 			20|    ***********|
 			  +---------------+
 		
