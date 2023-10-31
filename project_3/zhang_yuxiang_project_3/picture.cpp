@@ -258,7 +258,7 @@ int performCommands(string commandString, char& plotChar, int& mode, int& badPos
     return 0;
 }
 
-//test cases
+//Brandon's Test Cases
 int main() {
     //testplotLine()
     setSize(20, 15);
@@ -315,6 +315,12 @@ int main() {
     assert(performCommands("H25,H-10", pc, m, bad) == 1 && bad == 3);
     assert(performCommands("H\n", pc, m, bad) && bad == 1);
     assert(performCommands("f\n", pc, m, bad) && bad == 1);
+    assert(performCommands("V99F", pc, m, bad) == 1 && bad == 4);
+    assert(performCommands(" V10", pc, m, bad) == 1 && bad == 0);
+    assert(performCommands("V10 ", pc, m, bad) == 1 && bad == 3);
+    assert(performCommands("V-001", pc, m, bad) == 1 && bad == 4);
+    assert(performCommands("V-", pc, m, bad) == 1 && bad == 2);
+    assert(performCommands("V-1-", pc, m, bad) == 1 && bad == 3);
     //code2
     bad = 999;
     pc = '\n';
