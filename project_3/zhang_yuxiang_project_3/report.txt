@@ -115,12 +115,6 @@ c. Test Cases:
 	    		Comma insertion: assert(performCommands("H25,H-10", pc, m, bad) == 1 && bad == 3);
 			Unprintable character after H: assert(performCommands("H\n", pc, m, bad) == 1 && bad == 1);
 			Unprintable character after F: assert(performCommands("f\n", pc, m, bad) == 1 && bad == 1);
-			Syntax error and bad plot: assert(performCommands("V99F", pc, m, bad) == 1 && bad == 4);
-			Leading Space: assert(performCommands(" V10", pc, m, bad) == 1 && bad == 0);
-			Trailing Space: assert(performCommands("V10 ", pc, m, bad) == 1 && bad == 3);
-			Three digit V/H param: assert(performCommands("V-001", pc, m, bad) == 1 && bad == 4);
-			No number in V/H param: assert(performCommands("V-", pc, m, bad) == 1 && bad == 2);
-			Trailing '-' in V/H param: assert(performCommands("V-1-", pc, m, bad) == 1 && bad == 3);
 		Code 2: (pc and FG are modified)
 			Unprintable character passed as plotChar: assert(performCommands("", '\n', m, bad) == 2 && bad == 999);
 			Bad mode passed as mode: assert(performCommands("", pc, 10, bad) == 2 && bad == 999);
