@@ -8,12 +8,11 @@ a. Obstacles:
 
 b. Description:
 	1. PlotLine:
-		i. Checks for valid inputs
-		ii. Checks for valid mode
-		iii. Checks if starting point is in bounds
-		iv. Checks if plotChar is print
-		v. Splits into cases depending on whether HORIZ or VERT, but generally...
-
+		Checks for valid inputs
+		Checks for valid mode
+		Checks if starting point is in bounds
+		Checks if plotChar is print
+		Splits into cases depending on whether HORIZ or VERT, but...
 			finds endpoint and checks if it's within the grid
 			repeatedly:
 				plots point depending on what the mode is
@@ -21,26 +20,23 @@ b. Description:
 			plots endpoint
 
 	2. PerformCommands:
-		i. Checks if plotChar is print, and if mode is valid, returning code 2 if not
-		ii. Checks if commandString syntax is correct as follows...
-			
-			repeatedly:
-				reads next character in commandString and converts to lowercase
-				if the next command is...
-					'h' or 'v': verifies that a 1 or 2 digit number follows
-					'f' or 'b': verifies that following character is print
-					'c': moves on
-				anything else is considered invalid
-		
-		iii. Goes over commandString and attempts to perform commands as follows...
-			
-			repeatedly:
-				reads next character in commandString and converts to lowercase
-				if the next command is...
-					'h' or 'v': parses numerical parameter then calls plotLine() with it
-					'f' or 'b': changes mode and sets character to parameter
-					'c': clears grid and resets defaults
-				returns corresponding error code if anything bad happens
+		Checks if plotChar is print, and if mode is valid, returning code 2 if not
+		Checks if commandString syntax is correct as follows...
+		repeatedly:
+			reads next character in commandString and converts to lowercase
+			if the next command is...
+				'h' or 'v': verifies that a 1 or 2 digit number follows
+				'f' or 'b': verifies that following character is print
+				'c': moves on
+			anything else is considered invalid
+		Goes over commandString and attempts to perform commands as follows...
+		repeatedly:
+			reads next character in commandString and converts to lowercase
+			if the next command is...
+				'h' or 'v': parses numerical parameter then calls plotLine() with it
+				'f' or 'b': changes mode and sets character to parameter
+				'c': clears grid and resets defaults
+			returns corresponding error code if anything bad happens
 
 c. Test Cases:
 	1. plotLine() (Given Grid Size 20,15):
