@@ -259,90 +259,90 @@ int performCommands(string commandString, char& plotChar, int& mode, int& badPos
 }
 
 //Test Cases
-int main() {
-    //testplotLine()
-    setSize(20, 15);
-    //valid
-    assert(plotLine(1, 1, 10, HORIZ, '*', FG));
-    assert(plotLine(1, 1, 10, VERT, '*', FG));
-    assert(plotLine(10, 10, 0, HORIZ, '*', FG));
-    assert(plotLine(12, 10, 0, HORIZ, '*', FG));
-    assert(plotLine(20, 15, -10, HORIZ, '*', FG));
-    assert(plotLine(20, 15, -10, VERT, '*', BG));
-    assert(plotLine(20, 15, -10, VERT, '&', BG));
-    //invalid
-    assert(!plotLine(-1, 1, 10, HORIZ, '*', FG));
-    assert(!plotLine(1, -1, 10, HORIZ, '*', FG));
-    assert(!plotLine(20, 15, 10, HORIZ, '*', FG));
-    assert(!plotLine(20, 15, 10, VERT, '*', FG));
-    assert(!plotLine(1, 1, 10, 10, '*', FG));
-    assert(!plotLine(1, 1, 10, HORIZ, '*', 10));
-    assert(!plotLine(1, 1, 10, HORIZ, '\n', FG));
-
-    draw();
-
-    //test isValidCommandString()
-    int badPos = 999;
-    //valid
-    assert(isValidCommandString("H25H-10CF&b*v01", badPos) && badPos == 999);
-    assert(isValidCommandString("", badPos) && badPos == 999);
-    //invalid
-    assert(!isValidCommandString("F#H+25H?V3!", badPos) && badPos == 3);
-    assert(!isValidCommandString("B@H", badPos) && badPos == 3);
-    assert(!isValidCommandString("C12 ", badPos) && badPos == 1);
-    assert(!isValidCommandString("Q3V4#", badPos) && badPos == 0);
-    assert(!isValidCommandString("V03C H123#", badPos) && badPos == 4);
-    assert(!isValidCommandString("H5H-1-2", badPos) && badPos == 5);
-    assert(!isValidCommandString("FH8", badPos) && badPos == 2);
-    assert(!isValidCommandString("H25,H-10", badPos) && badPos == 3);
-    assert(!isValidCommandString("H\n", badPos) && badPos == 1);
-    assert(!isValidCommandString("f\n", badPos) && badPos == 1);
-
-    //test performCommands()
-    int bad = 999;
-    char pc = '*';
-    int m = FG;
-    setSize(12, 15);
-
-    //valid
-    assert(performCommands("V2", pc, m, bad) == 0 && bad == 999);
-    assert(performCommands("b^H14F&V11H-03", pc, m, bad) == 0 && bad == 999);
-    assert(performCommands("", pc, m , bad) == 0 && bad == 999);
-    //code1
-    assert(performCommands("F#H+25H?V3!", pc, m, bad) == 1 && bad == 3);
-    assert(performCommands("B@H", pc, m, bad) == 1 && bad == 3);
-    assert(performCommands("C12 ", pc, m, bad) == 1 && bad == 1);
-    assert(performCommands("Q3V4#", pc, m, bad) == 1 && bad == 0);
-    assert(performCommands("V03C H123#", pc, m, bad) == 1 && bad == 4);
-    assert(performCommands("H5H-1-2", pc, m, bad) == 1 && bad == 5);
-    assert(performCommands("FH8", pc, m, bad) == 1 && bad == 2);
-    assert(performCommands("H25,H-10", pc, m, bad) == 1 && bad == 3);
-    assert(performCommands("H\n", pc, m, bad) && bad == 1);
-    assert(performCommands("f\n", pc, m, bad) && bad == 1);
-    assert(performCommands("V99F", pc, m, bad) == 1 && bad == 4);
-    assert(performCommands(" V10", pc, m, bad) == 1 && bad == 0);
-    assert(performCommands("V10 ", pc, m, bad) == 1 && bad == 3);
-    assert(performCommands("V-001", pc, m, bad) == 1 && bad == 4);
-    assert(performCommands("V-", pc, m, bad) == 1 && bad == 2);
-    assert(performCommands("V-1-", pc, m, bad) == 1 && bad == 3);
-    //code2
-    bad = 999;
-    pc = '\n';
-    assert(performCommands("", pc, m, bad) == 2 && bad == 999);
-    pc = '*';
-    m = 10;
-    assert(performCommands("", pc, m, bad) == 2 && bad == 999);
-    m = FG;
-    //code3
-    assert(performCommands("H-1", pc, m, bad) == 3 && bad == 0);
-    assert(performCommands("V-1", pc, m, bad) == 3 && bad == 0);
-    assert(performCommands("H20", pc, m, bad) == 3 && bad == 0);
-    assert(performCommands("V20", pc, m, bad) == 3 && bad == 0);
-
-    draw();
-    cout << "All test cases passed" << endl;
-    return 0;
-}
+//int main() {
+//    //testplotLine()
+//    setSize(20, 15);
+//    //valid
+//    assert(plotLine(1, 1, 10, HORIZ, '*', FG));
+//    assert(plotLine(1, 1, 10, VERT, '*', FG));
+//    assert(plotLine(10, 10, 0, HORIZ, '*', FG));
+//    assert(plotLine(12, 10, 0, HORIZ, '*', FG));
+//    assert(plotLine(20, 15, -10, HORIZ, '*', FG));
+//    assert(plotLine(20, 15, -10, VERT, '*', BG));
+//    assert(plotLine(20, 15, -10, VERT, '&', BG));
+//    //invalid
+//    assert(!plotLine(-1, 1, 10, HORIZ, '*', FG));
+//    assert(!plotLine(1, -1, 10, HORIZ, '*', FG));
+//    assert(!plotLine(20, 15, 10, HORIZ, '*', FG));
+//    assert(!plotLine(20, 15, 10, VERT, '*', FG));
+//    assert(!plotLine(1, 1, 10, 10, '*', FG));
+//    assert(!plotLine(1, 1, 10, HORIZ, '*', 10));
+//    assert(!plotLine(1, 1, 10, HORIZ, '\n', FG));
+//
+//    draw();
+//
+//    //test isValidCommandString()
+//    int badPos = 999;
+//    //valid
+//    assert(isValidCommandString("H25H-10CF&b*v01", badPos) && badPos == 999);
+//    assert(isValidCommandString("", badPos) && badPos == 999);
+//    //invalid
+//    assert(!isValidCommandString("F#H+25H?V3!", badPos) && badPos == 3);
+//    assert(!isValidCommandString("B@H", badPos) && badPos == 3);
+//    assert(!isValidCommandString("C12 ", badPos) && badPos == 1);
+//    assert(!isValidCommandString("Q3V4#", badPos) && badPos == 0);
+//    assert(!isValidCommandString("V03C H123#", badPos) && badPos == 4);
+//    assert(!isValidCommandString("H5H-1-2", badPos) && badPos == 5);
+//    assert(!isValidCommandString("FH8", badPos) && badPos == 2);
+//    assert(!isValidCommandString("H25,H-10", badPos) && badPos == 3);
+//    assert(!isValidCommandString("H\n", badPos) && badPos == 1);
+//    assert(!isValidCommandString("f\n", badPos) && badPos == 1);
+//
+//    //test performCommands()
+//    int bad = 999;
+//    char pc = '*';
+//    int m = FG;
+//    setSize(12, 15);
+//
+//    //valid
+//    assert(performCommands("V2", pc, m, bad) == 0 && bad == 999);
+//    assert(performCommands("b^H14F&V11H-03", pc, m, bad) == 0 && bad == 999);
+//    assert(performCommands("", pc, m , bad) == 0 && bad == 999);
+//    //code1
+//    assert(performCommands("F#H+25H?V3!", pc, m, bad) == 1 && bad == 3);
+//    assert(performCommands("B@H", pc, m, bad) == 1 && bad == 3);
+//    assert(performCommands("C12 ", pc, m, bad) == 1 && bad == 1);
+//    assert(performCommands("Q3V4#", pc, m, bad) == 1 && bad == 0);
+//    assert(performCommands("V03C H123#", pc, m, bad) == 1 && bad == 4);
+//    assert(performCommands("H5H-1-2", pc, m, bad) == 1 && bad == 5);
+//    assert(performCommands("FH8", pc, m, bad) == 1 && bad == 2);
+//    assert(performCommands("H25,H-10", pc, m, bad) == 1 && bad == 3);
+//    assert(performCommands("H\n", pc, m, bad) && bad == 1);
+//    assert(performCommands("f\n", pc, m, bad) && bad == 1);
+//    assert(performCommands("V99F", pc, m, bad) == 1 && bad == 4);
+//    assert(performCommands(" V10", pc, m, bad) == 1 && bad == 0);
+//    assert(performCommands("V10 ", pc, m, bad) == 1 && bad == 3);
+//    assert(performCommands("V-001", pc, m, bad) == 1 && bad == 4);
+//    assert(performCommands("V-", pc, m, bad) == 1 && bad == 2);
+//    assert(performCommands("V-1-", pc, m, bad) == 1 && bad == 3);
+//    //code2
+//    bad = 999;
+//    pc = '\n';
+//    assert(performCommands("", pc, m, bad) == 2 && bad == 999);
+//    pc = '*';
+//    m = 10;
+//    assert(performCommands("", pc, m, bad) == 2 && bad == 999);
+//    m = FG;
+//    //code3
+//    assert(performCommands("H-1", pc, m, bad) == 3 && bad == 0);
+//    assert(performCommands("V-1", pc, m, bad) == 3 && bad == 0);
+//    assert(performCommands("H20", pc, m, bad) == 3 && bad == 0);
+//    assert(performCommands("V20", pc, m, bad) == 3 && bad == 0);
+//
+//    draw();
+//    cout << "All test cases passed" << endl;
+//    return 0;
+//}
 
 //Rachel's Test Cases
 //int main() {
@@ -549,3 +549,115 @@ int main() {
 //
 //    draw();
 //}
+
+// Andrew’s test cases
+int main() {
+    
+    // MARK: - Test `plotLine`
+    setSize(8, 20);
+    
+    // MARK: - Single points, valid
+    assert(plotLine(1, 1, 0, HORIZ, '*', FG) == true); // top left
+    assert(plotLine(1, 20, 0, HORIZ, '*', FG) == true); // top right
+    assert(plotLine(8, 1, 0, HORIZ, '*', FG) == true); // bottom left
+    assert(plotLine(8, 20, 0, HORIZ, '*', FG) == true); // bottom right
+    
+    // MARK: - Single points vertical, inset, valid
+    assert(plotLine(2, 2, 0, VERT, '#', FG) == true); // top left
+    assert(plotLine(2, 19, 0, VERT, '#', FG) == true); // top right
+    assert(plotLine(7, 2, 0, VERT, '#', FG) == true); // bottom left
+    assert(plotLine(7, 19, 0, VERT, '#', FG) == true); // bottom right
+    
+    // MARK: - Horizontal lines, valid
+    assert(plotLine(3, 1, 4, HORIZ, 'X', FG) == true); // 5 characters wide
+    assert(plotLine(3, 10, 10, HORIZ, 'X', FG) == true); // hits the right edge
+    assert(getChar(3, 10) == 'X'); // make sure the start is drawn
+    assert(getChar(3, 20) == 'X'); // make sure the end is drawn
+    
+    // MARK: - Vertical lines, valid
+    assert(plotLine(1, 7, 2, VERT, '@', FG) == true); // 3 characters tall
+    assert(plotLine(7, 7, 1, VERT, '@', FG) == true); // 2 characters tall, hits the bottom edge
+    
+    // MARK: - Negative distance
+    assert(plotLine(4, 20, -19, HORIZ, '<', FG) == true); // starting from the right edge to the left
+    assert(plotLine(8, 4, -7, VERT, '^', FG) == true); // starting from the bottom to the top
+    
+    // MARK: - Background lines
+    assert(plotLine(1, 14, 7, VERT, '$', BG) == true); // crosses under the X line
+    assert(getChar(2, 14) == '$'); // it used to be empty, so now it's changed to '$'
+    assert(getChar(3, 14) == 'X'); // drew in background, so now it should still be 'X'
+    
+    assert(plotLine(6, 1, 19, HORIZ, '&', BG) == true); // underneath the vertical line that was just drawn
+    assert(getChar(6, 13) == '&'); // it used to be empty, so now it's changed to '$'
+    assert(getChar(6, 14) == '$'); // drew in background, so now it should still be 'X'
+    
+    
+    // MARK: - Invalid lines
+    assert(plotLine(0, 0, 0, HORIZ, '&', FG) == false); // out of bounds
+    assert(plotLine(0, -1, 5, HORIZ, '&', FG) == false); // negative (out of bounds)
+    assert(plotLine(1, 1, 20, HORIZ, '&', FG) == false); // too wide
+    assert(plotLine(1, 1, 8, VERT, '&', FG) == false); // too tall
+    assert(plotLine(1, 1, 3, HORIZ, '\n', FG) == false); // non-printable char
+    assert(plotLine(1, 1, 3, HORIZ, '\t', BG) == false); // another non-printable char
+    
+    clearGrid();
+    
+    // MARK: - Test `performCommands`
+    char plotChar = '*';
+    int badPos = 999;
+    int mode = FG;
+    
+    // MARK: - Valid commands (returns 0)
+    assert(performCommands("h12V3H-1B@v-3", plotChar, mode, badPos) == 0 && badPos == 999); // combination of H, V, and Background
+    assert(performCommands("v2b h12fHh1fih0", plotChar, mode, badPos) == 0 && badPos == 999); // draws the word "Hi"
+    assert(performCommands("h19v7h-19v-6", plotChar, mode, badPos) == 0 && badPos == 999); // rectangle along edges
+    assert(performCommands("H19V7", plotChar, mode, badPos) == 0 && badPos == 999); // capital letters
+    assert(performCommands("h19v7", plotChar, mode, badPos) == 0 && badPos == 999); // lowercase letters
+    assert(performCommands("f h3", plotChar, mode, badPos) == 0 && badPos == 999); // "erase" existing characters with whitespace character
+    assert(performCommands("b v2", plotChar, mode, badPos) == 0 && badPos == 999); // "move" brush down first in the background
+    assert(performCommands("b v2f@h5", plotChar, mode, badPos) == 0 && badPos == 999); // move brush down then draw to the right
+    assert(performCommands("b v3b@h5", plotChar, mode, badPos) == 0 && badPos == 999); // move brush down then draw to the right (in background)
+    assert(performCommands("h19v7h-19v-6ch2", plotChar, mode, badPos) == 0 && badPos == 999); // test clear command
+    assert(getChar(1, 20) == ' '); // the rectangle's top right should have been cleared
+    assert(getChar(1, 3) == '*'); // after clearing the rectangle, we drew some asterisks at the top left
+    assert(performCommands("", plotChar, mode, badPos) == 0 && badPos == 999); // empty string should also work
+    
+    // MARK: - Syntax errors (returns 1)
+    assert(performCommands("F#H+25H?V3!", plotChar, mode, badPos) == 1 && badPos == 3); // leftmost syntax error
+    assert(performCommands("B@H", plotChar, mode, badPos) == 1 && badPos == 3); // expecting - or digit after H
+    assert(performCommands("C12", plotChar, mode, badPos) == 1 && badPos == 1); // C is one command; 1 can't start a command
+    assert(performCommands("Q3V4#", plotChar, mode, badPos) == 1 && badPos == 0); // Q can't start a command
+    assert(performCommands("V03C H123#", plotChar, mode, badPos) == 1 && badPos == 4); // space can't start a command
+    assert(performCommands("H18H-123#", plotChar, mode, badPos) == 1 && badPos == 7); // H-12 is one command; 3 can't start a command
+    assert(performCommands("H5H-1-2", plotChar, mode, badPos) == 1 && badPos == 5); // H-1 is one command; - can't start a command
+    assert(performCommands("FH8", plotChar, mode, badPos) == 1 && badPos == 2); // FH is one command; 8 can't start a command
+    assert(performCommands("H\n", plotChar, mode, badPos) == 1 && badPos == 1); // the horizontal brush char is set to a non-printable character
+    assert(performCommands("H4V\n", plotChar, mode, badPos) == 1 && badPos == 3); // the vertical brush char is set to a non-printable character
+    assert(performCommands("v4b\n", plotChar, mode, badPos) == 1 && badPos == 3); // changing to background with a non-printable character
+    assert(performCommands("V99F", plotChar, mode, badPos) == 1 && badPos == 4); // there is an out of bounds error, but the syntax error at the end takes precedence
+    assert(performCommands(" ", plotChar, mode, badPos) == 1 && badPos == 0); // blank space, which isn't a valid command
+    assert(performCommands(" H19V7", plotChar, mode, badPos) == 1 && badPos == 0); // starting with a space, but the rest is valid
+    assert(performCommands("H19 V7", plotChar, mode, badPos) == 1 && badPos == 3); // extra space in the middle
+    assert(performCommands("H19,V7", plotChar, mode, badPos) == 1 && badPos == 3); // extra comma in the middle
+    assert(performCommands("H19V ", plotChar, mode, badPos) == 1 && badPos == 4); // missing value after the vertical command
+    assert(performCommands("H19V--", plotChar, mode, badPos) == 1 && badPos == 5); // the second negative is invalid
+    assert(performCommands("H19V-1-2", plotChar, mode, badPos) == 1 && badPos == 6); // duplicate values, report the bad position of the second one
+    
+    // MARK: - Invalid input (returns 2)
+    badPos = 999; // reset bad position to initial
+    mode = FG; // reset to FG
+    
+    plotChar = '\n'; // set to non-printable char
+    assert(performCommands("h19v7h-19v-6", plotChar, mode, badPos) == 2 && badPos == 999); // non-printable char
+    plotChar = '*'; // reset
+    
+    mode = 100;
+    assert(performCommands("h19v7h-19v-6", plotChar, mode, badPos) == 2 && badPos == 999); // invalid mode/fgbg value (not 0 or 1)
+    mode = FG; // reset to FG
+    
+    // MARK: - Out of bounds (returns 3)
+    assert(performCommands("h20", plotChar, mode, badPos) == 3 && badPos == 0); // one too much to the right
+    assert(performCommands("v-2", plotChar, mode, badPos) == 3 && badPos == 0); // drew out of bounds to the top
+    assert(performCommands("h20h-20", plotChar, mode, badPos) == 3 && badPos == 0); // multiple errors, return position of the first one (0)
+    assert(performCommands("h19v-99", plotChar, mode, badPos) == 3 && badPos == 3); // horizontal command is fine but vertical one draws out of bounds
+}

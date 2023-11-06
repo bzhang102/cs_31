@@ -1,0 +1,73 @@
+1. Obstacles:
+
+2. Test Cases:
+	int reduplicate(string a[], int n);
+		string stuff[6] = { "mahi", " ", "cous", "", "tar", "mur" };
+		
+		Valid:
+		Normal use case: assert(reduplicate(stuff, 6) == 6);
+		n < number of elements in arr[]: assert(reduplicate(stuff, 3) == 3);
+		n == 0: assert(reduplicate(stuff, 0) == 0);
+
+		Invalid:
+		n < 0: assert(reduplicate(stuff, -10) == -1);
+
+		stuff[] after calls: mahimahimahimahi      couscouscouscous  tartar murmur 
+
+	int locate(const string a[], int n, string target):
+		string arr[4] = { "mahi", "mahi", "MAHI", ""};
+		
+		Valid:
+		Normal use case: assert(locate(arr, 4, "mahi") == 0);
+		Not found: assert(locate(arr, 4, "mAhI") == -1);
+		Case sensitivity: assert(locate(arr, 4, "MAHI") == 2);
+		Empty string: assert(locate(arr, 4, "") == 3);
+		
+		Invalid:
+		n < number of elements in arr[]: assert(locate(arr, 2, "MAHI") == -1);
+		n == 0: assert(locate(arr, 0, "mahi") == -1);
+		n < 0: assert(locate(arr, -10, "mahi") == -1);
+
+	int locationOfMax(const string a[], int n):
+		string cand[6] = {"", "donald", "ron", "ron", "vivek", "Nikki"};
+
+		Valid:
+		Normal use case: assert(locationOfMax(cand, 6) == 5);
+		Highest lowercase: assert(locationOfMax(cand, 5) == 4);
+		First detection of duplicates: assert(locationOfMax(cand, 4) == 2);
+		Empty string is still counted: assert(locationOfMax(cand, 1) == 0);
+
+		Invalid:
+		n == 0: assert(locationOfMax(cand, 0) == -1);
+		n < 0: assert(locationOfMax(cand, -10) == -1);
+
+	int circleLeft(string a[], int n, int pos):
+		string running[5] = { "nikki", "donald", "asa", "tim", "ron"};
+		
+		Valid:
+		Normal use case: assert(circleLeft(running, 5, 1) == 1);
+		pos == 0: assert(circleLeft(running, 5, 0) == 0);
+		pos == n - 1 == 0: assert(circleLeft(running, 1, 0) == 0);
+
+		Invalid:
+		pos > n - 1: assert(circleLeft(running, 5, 5) == -1);
+		pos < 0: assert(circleLeft(running, 5, 1) == -1);
+		n < 0: assert(circleLeft(running, -10, 0) == -1);
+
+	int enumerateRuns(const string a[], int n):
+		string names[9] = {"", "chris", "doug", "tim", "tim", "vivek", "vivek", "vivek", "tim", "tim"};
+
+		Valid:
+    		Normal use case: assert(enumerateRuns(names, 10) == 6);
+		n < number of elements in names[]: assert(enumerateRuns(names, 8) == 5);
+		n == 1: assert(enumerateRuns(names, 1) == 1);
+		n == 0: assert(enumerateRuns(names, 0) == 0);
+		
+		Invalid:
+		n < 0: assert(enumerateRuns(names, -10) == -1);
+
+	
+
+		
+
+		
