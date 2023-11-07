@@ -1,8 +1,12 @@
+Yuxiang Zhang
+206142605
+
 1. Obstacles:
+No notable obstacles were encountered during the implementation of this project. This was a relatively straight-forward and intuitive spec to understand with few complicated edge cases and scenarios.
 
 2. Test Cases:
 	int reduplicate(string a[], int n);
-		string stuff[6] = { "mahi", " ", "cous", "", "tar", "mur" };
+		string stuff[6] = {"mahi", " ", "cous", "", "tar", "mur"};
 		
 		Valid:
 		Normal use case: assert(reduplicate(stuff, 6) == 6);
@@ -12,10 +16,10 @@
 		Invalid:
 		n < 0: assert(reduplicate(stuff, -10) == -1);
 
-		stuff[] after calls: mahimahimahimahi      couscouscouscous  tartar murmur 
+		stuff[] after calls: mahimahimahimahi    couscouscouscoustartarmurmur
 
 	int locate(const string a[], int n, string target):
-		string arr[4] = { "mahi", "mahi", "MAHI", ""};
+		string arr[4] = {"mahi", "mahi", "MAHI", ""};
 		
 		Valid:
 		Normal use case: assert(locate(arr, 4, "mahi") == 0);
@@ -42,7 +46,7 @@
 		n < 0: assert(locationOfMax(cand, -10) == -1);
 
 	int circleLeft(string a[], int n, int pos):
-		string running[5] = { "nikki", "donald", "asa", "tim", "ron"};
+		string running[5] = {"nikki", "donald", "asa", "tim", "ron"};
 		
 		Valid:
 		Normal use case: assert(circleLeft(running, 5, 1) == 1);
@@ -53,6 +57,8 @@
 		pos > n - 1: assert(circleLeft(running, 5, 5) == -1);
 		pos < 0: assert(circleLeft(running, 5, 1) == -1);
 		n < 0: assert(circleLeft(running, -10, 0) == -1);
+
+		running[] after calls: asatimrondonaldnikki
 
 	int enumerateRuns(const string a[], int n):
 		string names[9] = {"", "chris", "doug", "tim", "tim", "vivek", "vivek", "vivek", "tim", "tim"};
@@ -66,8 +72,87 @@
 		Invalid:
 		n < 0: assert(enumerateRuns(names, -10) == -1);
 
-	
+	int flip(string a[], int n):
+		string folks[6] = {"donald", "tim", "", "chris", "nikki", "donald"};
+		
+		Valid:
+		Normal use case: assert(flip(folks, 6) == 6);
+		n < number of elements in folks[]: assert(flip(folks, 3) == 3);
+		n == 1: assert(flip(folks, 1) == 1);
+		n == 0: assert(flip(folks, 0) == 0);
+
+		Invalid:
+		n < 0: assert(flip(folks, -10) == -1);
+
+		folks[] after calls: chrisnikkidonaldtimdonald
+
+	int locateDifference(const string a1[], int n1, const string a2[], int n2):
+		string group1[6] = {"donald", "tim", "", "chris", "nikki", "donald"};
+		string group2[5] = {"donald", "tim", "donald", "", "chris"};
+		
+		Valid:
+		Normal use case: assert(locateDifference(group1, 6, group2, 5) == 2);
+		n1 < n2: assert(locateDifference(group1, 2, group2, 3) == 2);
+		n2 > n1: assert(locateDifference(group1, 3, group2, 2) == 2);
+		n1 == n2: assert(locateDifference(group1, 2, group2, 2) == 2);
+		n1 == 0: assert(locateDifference(group1, 0, group2, 2) == 0);
+		n2 == 0: assert(locateDifference(group1, 2, group2, 0) == 0);
+
+		Invalid:
+		n1 < 0: assert(locateDifference(group1, -10, group2, 2) == -1);
+		n2 < 0: assert(locateDifference(group1, 2, group2, -10) == -1);
+
+	int subsequence(const string a1[], int n1, const string a2[], int n2):
+		string names1[5] = {"nikki", "doug", "ron", "", "vivek"};
+		string names2[3] = {"ron", "", "vivek"};
+		string names3[2] = {"nikki", ""};
+		string names4[2] = {"nikki", ""};
+		
+		Valid:
+		Normal use case found: assert(subsequence(names1, 5, names2, 3) == 2);
+		Normal use case not found: assert(subsequence(names1, 5, names3, 2) == -1);
+		Target array is longer than search array: assert(subsequence(names3, 2, names3, 3) == -1);
+		Zero length target array: assert(subsequence(names1, 5, names2, 0) == 0);
+		n1 == n2: assert(subsequence(names3, 2, names4, 2) == 0);
+		n1 == n2 == 0: assert(subsequence(names1, 0, names2, 0) == 0);
+		
+		Invalid:
+		n1 < 0: assert(subsequence(names1, -10, names2, 0) == -1);
+		n2 < 0: assert(subsequence(names1, 5, names2, -10) == -1);
+
+	int locateAny(const string a1[], int n1, const string a2[], int n2):
+		string set1[5] = {"nikki", "ron", "tim", "ron", "doug"};
+		string set2[4] = {"donald", "doug", "vivek", "ron"};
+		string set3[2] = {"chris", "asa"};
+
+		Valid:
+		Normal use case: assert(locateAny(set1, 5, set2, 4) == 1);
+		Not found: assert(locateAny(set1, 5, set3, 2) == -1);
+		n1 == 0: assert(locateAny(set1, 0, set2, 2) == -1);
+		n2 == 0: assert(locateAny(set1, 5, set2, 0) == -1);
+
+		Invalid:
+		n1 < 0: assert(locateAny(set1, -10, set2, 2) == -1);
+		n2 < 0: assert(locateAny(set1, 5, set2, -10) == -1);
+
+	int divide(string a[], int n, string divider):
+		string peeps1[6] = {"donald", "asa", "ron", "vivek", "chris", "nikki"};
+    		string peeps2[4] = {"ron", "vivek", "asa", "tim"};
+
+		Valid:
+		Normal use case: assert(divide(peeps1, 6, "doug") == 3);
+    		Normal use case: assert(divide(peeps1, 6, "brandon") == 1);
+    		divider exists within a[]: assert(divide(peeps2, 4, "tim") == 2);
+    		divider > all elements in a[]: assert(divide(peeps1, 6, "zach") == 6);
+    		divider < all elements in a[]: assert(divide(peeps1, 6, "a") == 0);
+    		divider is empty string: assert(divide(peeps1, 6, "") == 0);
+    		n == 0: assert(divide(peeps1, 0, "doug") == 0);
+    		
+		Invalid:
+		n < 0: assert(divide(peeps1, -10, "doug") == -1);
+		
 
 		
+
 
 		
