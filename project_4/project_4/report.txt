@@ -111,7 +111,11 @@ No notable obstacles were encountered during the implementation of this project.
 		Valid:
 		Normal use case found: assert(subsequence(names1, 5, names2, 3) == 2);
 		Normal use case not found: assert(subsequence(names1, 5, names3, 2) == -1);
+<<<<<<< HEAD
 		Target array is longer than search array: assert(subsequence(names3, 2, names2, 3) == -1);
+=======
+		Target array is longer than search array: assert(subsequence(names3, 2, names3, 3) == -1);
+>>>>>>> 3e5d3c7724c1c7f74d1a4f3ac5852a98b6aa360a
 		Zero length target array: assert(subsequence(names1, 5, names2, 0) == 0);
 		n1 == n2: assert(subsequence(names3, 2, names4, 2) == 0);
 		n1 == n2 == 0: assert(subsequence(names1, 0, names2, 0) == 0);
