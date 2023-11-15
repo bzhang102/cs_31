@@ -9,11 +9,17 @@ using namespace std;
 bool getToken(char token[], istream& inf) {
     char c;
     while(inf.get(c)) {
-        //appends to token
-        if(!isspace(c) && c != '\n' && c != '\t') {
+        //appends to token and continues
+        if(!isspace(c) && c != '\n' && c != '\t' && c != '-') {
             token[strlen(token)] = c;
+            
+        //appends to token and returns if hyphen
+        } else if (c == '-') {
+            token[strlen(token)] = c;
+            return false;
+            
+        //returns if whitespace
         } else {
-            //end of token reached (hit whitespace)
             return false;
         }
     }
@@ -28,32 +34,67 @@ int render(int lineLength, istream& inf, ostream& outf) {
         return 2;
     }
     
+    bool bad = false;
+    int lastChar = '\0';
     int len = 0;
     //iterates through input as series of tokens
     for(;;) {
         char token[181] = "";
         
-        //breaks at end of file while reading next token
+        //reads next token; breaks at end of file
         if(getToken(token, inf)) {
             break;
         }
-        
+                
+        //checks if token is longer than maximum line length, if so, split renders
+        if(strlen(token) > lineLength) {
+            for(int i = 0; i < strlen(token); i++) {
+                //render char onto current line
+                if(len + 1 <= lineLength) {
+                    outf << token[i];
+                    len++;
+                    
+                //render onto new line
+                } else {
+                    outf << endl << token[i];
+                    len = 1;
+                }
+            }
+                
+            lastChar = token[strlen(token) - 1];
+            bad = true;
+            
         //checks for and executes paragraph break
-        if(strcmp(token, "@P@") == 0) {
+        } else if(strcmp(token, "@P@") == 0) {
             outf << endl << endl;
             len = 0;
             
         //if not paragraph break, attempts to render on current line
         } else {
-            if(len + strlen(token) + 1 <= lineLength) {
-                //appends space if token is not empty and token is not first in line
-                if(len != 0 && strlen(token) != 0) {
-                    outf << " ";
-                    len++;
-                }
+            //case: empty token (does nothing)
+            if(strlen(token) == 0) {
                 
+            //case: first token
+            } else if(len == 0 && strlen(token) <= lineLength) {
                 outf << token;
                 len += strlen(token);
+            
+            //case: last character was normal character
+            } else if((lastChar != '.' && lastChar != '?' && lastChar != '!' && lastChar != ':') && len +           strlen(token) + 1 <= lineLength) {
+                outf << " " << token;
+                len += strlen(token) + 1;
+                
+            //case: last character was hypen
+            } else if(lastChar == '-' && len + strlen(token) <= lineLength) {
+                outf << token;
+                len += strlen(token);
+                
+            //case: last character was punctuation
+            } else if((lastChar == '.' || lastChar == '?' || lastChar == '!' || lastChar == ':') &&
+                      len + strlen(token) + 2 <= lineLength) {
+                outf << "  " << token;
+                len += strlen(token) + 2;
+                
             //word does not fit
             } else {
                 //reset len to equal current token length
@@ -61,11 +102,19 @@ int render(int lineLength, istream& inf, ostream& outf) {
                 //render token on next line
                 outf << endl << token;
             }
+            
+            //updates lastChar
+            if(strlen(token) > 0) {
+                lastChar = token[strlen(token) - 1];
+            }
         }
     }
     
-    return 0;
-}
+    //returns 1 if token longer than lineLength is found
+    if(bad) {
+        return 1;
+    }
+    return 0;}
 
 int main()
 {
@@ -79,5 +128,4 @@ int main()
     }
     int len = 40;
     return render(len, infile, outfile);
-
 }
