@@ -35,6 +35,7 @@ int render(int lineLength, istream& inf, ostream& outf) {
     }
     
     bool bad = false;
+    bool lastBreak = false;
     int lastChar = '\0';
     int len = 0;
     //iterates through input as series of tokens
@@ -64,11 +65,18 @@ int render(int lineLength, istream& inf, ostream& outf) {
             lastChar = token[strlen(token) - 1];
             bad = true;
             
+            //refreshes lastBreak
+            lastBreak = false;
+            
         //checks for and executes paragraph break
         } else if(strcmp(token, "@P@") == 0) {
-            outf << endl << endl;
-            len = 0;
-            
+            //handles multiple paragraph breaks in a row
+            if(!lastBreak) {
+                outf << endl << endl;
+                len = 0;
+                lastBreak = true;
+            }
+    
         //if not paragraph break, attempts to render on current line
         } else {
             //case: empty token (does nothing)
@@ -107,6 +115,11 @@ int render(int lineLength, istream& inf, ostream& outf) {
             if(strlen(token) > 0) {
                 lastChar = token[strlen(token) - 1];
             }
+            
+            //refreshes lastBreak
+            if(strlen(token) != 0) {
+                lastBreak = false;
+            }
         }
     }
     
@@ -126,6 +139,6 @@ int main()
     if(!infile) {
         cout << "NO OUTPUT" << endl;
     }
-    int len = 40;
+    int len = 251;
     return render(len, infile, outfile);
 }
