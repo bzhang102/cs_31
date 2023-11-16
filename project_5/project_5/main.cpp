@@ -10,15 +10,15 @@ bool getToken(char token[], istream& inf) {
     char c;
     while(inf.get(c)) {
         //appends to token and continues
-        if(!isspace(c) && c != '\n' && c != '\t' && c != '-') {
+        if(!isspace(c) && c != '-') {
             token[strlen(token)] = c;
             
-        //appends to token and returns if hyphen
+            //appends to token and returns if hyphen
         } else if (c == '-') {
             token[strlen(token)] = c;
             return false;
             
-        //returns if whitespace
+            //returns if whitespace
         } else {
             return false;
         }
@@ -30,14 +30,14 @@ bool getToken(char token[], istream& inf) {
 
 //function implementation
 int render(int lineLength, istream& inf, ostream& outf) {
+    //return 2 if invalid lineLength
     if(lineLength < 1) {
         return 2;
     }
     
     bool bad = false;
-    bool lastBreak = false;
-    int lastChar = '\0';
     int len = 0;
+    char prevToken[181] = "@P@";
     //iterates through input as series of tokens
     for(;;) {
         char token[181] = "";
@@ -46,80 +46,71 @@ int render(int lineLength, istream& inf, ostream& outf) {
         if(getToken(token, inf)) {
             break;
         }
+        
+        //skips over empty tokens
+        if(strlen(token) != 0) {
+            //checks for and executes paragraph break
+            if(strcmp(token, "@P@") == 0) {
+                //handles multiple paragraph breaks in a row
+                if(strcmp(prevToken, "@P@") != 0) {
+                    outf << endl << endl;
+                    len = 0;
+                }
                 
-        //checks if token is longer than maximum line length, if so, split renders
-        if(strlen(token) > lineLength) {
-            for(int i = 0; i < strlen(token); i++) {
-                //render char onto current line
-                if(len + 1 <= lineLength) {
-                    outf << token[i];
-                    len++;
+                //checks if token is longer than maximum line length, if so, split renders
+            } else if(strlen(token) > lineLength) {
+                for(int i = 0; i < strlen(token); i++) {
+                    //render char onto current line
+                    if(len + 1 <= lineLength) {
+                        outf << token[i];
+                        len++;
+                        
+                        //render onto new line
+                    } else {
+                        outf << endl << token[i];
+                        len = 1;
+                    }
+                }
+                bad = true;
+                
+                //attempts to render on current line
+            } else {
+                //gets last character
+                char lastChar = prevToken[strlen(prevToken) - 1];
+                cout << token << " " << lastChar << endl;
+                
+                //case: first token
+                if(len == 0 && strlen(token) <= lineLength) {
+                    outf << token;
+                    len += strlen(token);
                     
-                //render onto new line
+                    //case: last character was hypen, prepend no spaces
+                } else if(lastChar == '-' && len + strlen(token) <= lineLength) {
+                    outf << token;
+                    len += strlen(token);
+                    
+                    //case: last character was normal character, prepend one space
+                } else if((lastChar != '.' && lastChar != '?' && lastChar != '!' && lastChar != ':') && len +           strlen(token) + 1 <= lineLength) {
+                    outf << " " << token;
+                    len += strlen(token) + 1;
+                    
+                    //case: last character was punctuation, prepend two spaces
+                } else if((lastChar == '.' || lastChar == '?' || lastChar == '!' || lastChar == ':') &&
+                          len + strlen(token) + 2 <= lineLength) {
+                    outf << "  " << token;
+                    len += strlen(token) + 2;
+                    
+                    //case: word does not fit, start new line
                 } else {
-                    outf << endl << token[i];
-                    len = 1;
+                    //reset len to equal current token length
+                    len = (int) strlen(token);
+                    //render token on next line
+                    outf << endl << token;
                 }
             }
-                
-            lastChar = token[strlen(token) - 1];
-            bad = true;
             
-            //refreshes lastBreak
-            lastBreak = false;
-            
-        //checks for and executes paragraph break
-        } else if(strcmp(token, "@P@") == 0) {
-            //handles multiple paragraph breaks in a row
-            if(!lastBreak) {
-                outf << endl << endl;
-                len = 0;
-                lastBreak = true;
-            }
-    
-        //if not paragraph break, attempts to render on current line
-        } else {
-            //case: empty token (does nothing)
-            if(strlen(token) == 0) {
-                
-            //case: first token
-            } else if(len == 0 && strlen(token) <= lineLength) {
-                outf << token;
-                len += strlen(token);
-            
-            //case: last character was normal character
-            } else if((lastChar != '.' && lastChar != '?' && lastChar != '!' && lastChar != ':') && len +           strlen(token) + 1 <= lineLength) {
-                outf << " " << token;
-                len += strlen(token) + 1;
-                
-            //case: last character was hypen
-            } else if(lastChar == '-' && len + strlen(token) <= lineLength) {
-                outf << token;
-                len += strlen(token);
-                
-            //case: last character was punctuation
-            } else if((lastChar == '.' || lastChar == '?' || lastChar == '!' || lastChar == ':') &&
-                      len + strlen(token) + 2 <= lineLength) {
-                outf << "  " << token;
-                len += strlen(token) + 2;
-                
-            //word does not fit
-            } else {
-                //reset len to equal current token length
-                len = (int) strlen(token);
-                //render token on next line
-                outf << endl << token;
-            }
-            
-            //updates lastChar
-            if(strlen(token) > 0) {
-                lastChar = token[strlen(token) - 1];
-            }
-            
-            //refreshes lastBreak
-            if(strlen(token) != 0) {
-                lastBreak = false;
-            }
+            //update prevToken
+            strcpy(prevToken, token);
         }
     }
     
@@ -127,7 +118,9 @@ int render(int lineLength, istream& inf, ostream& outf) {
     if(bad) {
         return 1;
     }
-    return 0;}
+    //returns 0 if state normal
+    return 0;
+}
 
 int main()
 {
@@ -139,6 +132,6 @@ int main()
     if(!infile) {
         cout << "NO OUTPUT" << endl;
     }
-    int len = 251;
+    int len = 15;
     return render(len, infile, outfile);
 }

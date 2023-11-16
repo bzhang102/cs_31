@@ -1,6 +1,1 @@
-The first word, Let's will be at the start of a new paragraph.  @P@@P@ The next word, check, with a preceding blank won't fit on that line, so we should write a newline.  After writing that word, the next word, what will go ...  Wait a minute — in
-figuring out what to do with each word of the input, we're not even paying attention to details about how the words are separated in the actual
-
-@P@@P@
-
-input (with one space, more spaces, a newline, etc.).  That's an important realization:  The part of the program that figures out what to do with each word cares only about the following sequence:
+asdf-asdf
