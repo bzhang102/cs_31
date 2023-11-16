@@ -2,10 +2,12 @@
 Yuxiang Zhang
 
 a. Obstacles:
-	1. For me at least, this project was deceptively easy... I thought I finished my project 
+	For me at least, this project was deceptively easy... I thought I finished my project 
 	in a single sitting of three hours, only to go back the next day and discover that I had 
 	numerous small, but critical flaws in my errors including, but not limited to:
-		i. Not handling leading and trailing paragraph breaks properly
-		ii. Not handling hyphens correctly when they are not trailed by spaces 
+		1. Not handling leading and trailing paragraph breaks properly
+			i. Fixed by prepending breaks, much like what is done with spaces
+		2. Not handling hyphens correctly when they are not trailed by spaces
+			ii. Fixed by 
 b. Description:
 c. Test Cases:

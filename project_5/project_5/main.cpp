@@ -36,6 +36,7 @@ int render(int lineLength, istream& inf, ostream& outf) {
     }
     
     bool bad = false;
+    bool prependBreak = false;
     int len = 0;
     char prevToken[181] = "@P@";
     //iterates through input as series of tokens
@@ -49,16 +50,21 @@ int render(int lineLength, istream& inf, ostream& outf) {
         
         //skips over empty tokens
         if(strlen(token) != 0) {
-            //checks for and executes paragraph break
+            //checks for and prepares for break
             if(strcmp(token, "@P@") == 0) {
-                //handles multiple paragraph breaks in a row
+                //avoids leading and consecutive breaks
                 if(strcmp(prevToken, "@P@") != 0) {
-                    outf << endl << endl;
-                    len = 0;
+                    prependBreak = true;
                 }
                 
                 //checks if token is longer than maximum line length, if so, split renders
             } else if(strlen(token) > lineLength) {
+                if(prependBreak) {
+                    outf << endl << endl;
+                    len = 0;
+                    prependBreak = false;
+                }
+                
                 for(int i = 0; i < strlen(token); i++) {
                     //render char onto current line
                     if(len + 1 <= lineLength) {
@@ -77,14 +83,19 @@ int render(int lineLength, istream& inf, ostream& outf) {
             } else {
                 //gets last character
                 char lastChar = prevToken[strlen(prevToken) - 1];
-                cout << token << " " << lastChar << endl;
+                
+                if(prependBreak) {
+                    outf << endl << endl;
+                    len = 0;
+                    prependBreak = false;
+                }
                 
                 //case: first token
                 if(len == 0 && strlen(token) <= lineLength) {
                     outf << token;
                     len += strlen(token);
                     
-                    //case: last character was hypen, prepend no spaces
+                    //case: last character was hypen
                 } else if(lastChar == '-' && len + strlen(token) <= lineLength) {
                     outf << token;
                     len += strlen(token);
@@ -108,7 +119,6 @@ int render(int lineLength, istream& inf, ostream& outf) {
                     outf << endl << token;
                 }
             }
-            
             //update prevToken
             strcpy(prevToken, token);
         }
@@ -126,12 +136,12 @@ int main()
 {
     ifstream infile("/Users/brandon/IDEs/XCode/cs_31/project_5/project_5/in");
     if(!infile) {
-        cout << "NO INPUT" << endl;
+        cerr << "NO INPUT" << endl;
     }
     ofstream outfile("/Users/brandon/IDEs/XCode/cs_31/project_5/project_5/out");
     if(!infile) {
-        cout << "NO OUTPUT" << endl;
+        cerr << "NO OUTPUT" << endl;
     }
-    int len = 15;
+    int len = 40;
     return render(len, infile, outfile);
 }
