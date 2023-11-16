@@ -8,6 +8,6 @@ a. Obstacles:
 		1. Not handling leading and trailing paragraph breaks properly
 			i. Fixed by prepending breaks, much like what is done with spaces
 		2. Not handling hyphens correctly when they are not trailed by spaces
-			ii. Fixed by 
+			ii. Fixed by handling empty tokens after hyphens differently
 b. Description:
 c. Test Cases:
