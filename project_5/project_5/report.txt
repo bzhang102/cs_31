@@ -10,4 +10,35 @@ a. Obstacles:
 		2. Not handling hyphens correctly when they are not trailed by spaces
 			ii. Fixed by handling empty tokens after hyphens differently
 b. Description:
+
+	getToken(): (helper function)
+		while istream is not in error state (not at end of file), repeatedly:
+			reads current character
+			if character is:
+				normal character: appends and continues reading
+				hyphen: appends hyphen to token and returns false (end of file not reached)
+				whitespace: returns without appending to token (end of file not reached)
+		if loop exited, return true (end of file reached)
+
+	render():
+		return 2 if lineLength is invalid
+		repeatedly:
+			reads next token using getToken, and breaks if end of file reached
+			if token is not empty:
+				if token is a @P@ (paragraph break):
+					determine if a paragraph break should be printed before the next token
+				else if the token is longer than the line length:
+					prepend spaces on current line if they fit, or else scrap all of them and start new line
+					render the token character by character, starting new lines as needed
+					set error state to 1 and return 1 at the end of render()
+				else (token is valid length and not paragraph break):
+					if the token fits on this line:
+						prepend spaces and render token
+					else (token does not fit):
+						start new line and render token
+				determine the number of spaces to be prepended to the next token
+			else:
+				if last character was a hyphen prepare to prepend a single space to the next token (case: asdf- asdf)
+		return 1 if a token longer than line length was found, else return 0
+
 c. Test Cases:
