@@ -10,20 +10,13 @@ bool getToken(char token[], istream& inf) {
     char c;
     while(inf.get(c)) {
         //appends to token and continues
-        if(!isspace(c) && (c != '-')) {
+        if(!isspace(c)) {
             token[strlen(token)] = c;
-            
-            //appends to token and returns if hyphen
-        } else if (c == '-') {
-            token[strlen(token)] = c;
-            return false;
-            
-            //returns if whitespace
+            //returns if whitespace without appending
         } else {
             return false;
         }
     }
-    
     //end of file reached (while condition not satisfied)
     return true;
 }
@@ -34,26 +27,20 @@ int render(int lineLength, istream& inf, ostream& outf) {
     if(lineLength < 1) {
         return 2;
     }
-    
     //state trackers
     bool bad = false;
     int len = 0;
-    
     //prepend trackers
     bool prependBreak = false;
     int prependSpaces = 0;
     char prevToken[181] = "@P@";
-    char lastChar = '\0';
-    
     //iterates through input as series of tokens
     for(;;) {
         char token[181] = "";
-        
         //reads next token; breaks at end of file
         if(getToken(token, inf)) {
             break;
         }
-        
         //avoids empty tokens
         if(strlen(token) != 0) {
             //checks for break
@@ -62,7 +49,6 @@ int render(int lineLength, istream& inf, ostream& outf) {
                 if(strcmp(prevToken, "@P@") != 0) {
                     prependBreak = true;
                 }
-                
                 //attempts to render token
             } else {
                 //prepends break
@@ -72,9 +58,31 @@ int render(int lineLength, istream& inf, ostream& outf) {
                     prependSpaces = 0;
                     prependBreak = false;
                 }
-                
-                //renders token longer than line length
-                if(strlen(token) > lineLength) {
+
+                //renders token that fits on current line
+                if(strlen(token) <= lineLength) {
+                    //string fits
+                    if(len + prependSpaces + strlen(token) <= lineLength) {
+                        //render required spaces
+                        while(prependSpaces > 0) {
+                            outf << ' ';
+                            prependSpaces--;
+                            len++;
+                        }
+                        //render token
+                        outf << token;
+                        len += strlen(token);
+                        
+                        //string does not fit
+                    } else {
+                        prependSpaces = 0;
+                        len = (int) strlen(token);
+                        //render token on next line
+                        outf << endl << token;
+                    }
+                    
+                    //renders token longer than line length
+                } else {
                     //prepends spaces if possible
                     if(len + prependSpaces < lineLength) {
                         while(prependSpaces > 0) {
@@ -87,7 +95,6 @@ int render(int lineLength, istream& inf, ostream& outf) {
                         len = 0;
                         prependSpaces = 0;
                     }
-                    
                     //renders oversize token char by char
                     for(int i = 0; i < strlen(token); i++) {
                         //render char onto current line
@@ -101,61 +108,22 @@ int render(int lineLength, istream& inf, ostream& outf) {
                             len = 1;
                         }
                     }
-                    
                     //generates error state of 1
                     bad = true;
-                    
-                    //attempts to render on current line
-                } else {
-                    //string fits
-                    if(len + prependSpaces + strlen(token) <= lineLength) {
-                        //render required spaces
-                        while(prependSpaces > 0) {
-                            outf << ' ';
-                            prependSpaces--;
-                            len++;
-                        }
-                        
-                        //render token
-                        outf << token;
-                        len += strlen(token);
-                        
-                        //string does not fit
-                    } else {
-                        prependSpaces = 0;
-                        len = (int) strlen(token);
-                        //render token on next line
-                        outf << endl << token;
-                    }
                 }
-                
                 //prepare to prepend space to next token if not break
-                lastChar = token[strlen(token) - 1];
-                switch(lastChar) {
-                    case '-':
-                        prependSpaces = 0;
-                        break;
-                    case '.':
-                    case '?':
-                    case '!':
-                    case ':':
-                        prependSpaces = 2;
-                        break;
-                    default:
-                        prependSpaces = 1;
+                char lastChar = token[strlen(token) - 1];
+                if(lastChar == '.' || lastChar == '!' || lastChar == '?' || lastChar == ':') {
+                    prependSpaces = 2;
+                } else {
+                    prependSpaces = 1;
                 }
             }
-            
             //update prevToken
             strcpy(prevToken, token);
-            
-        //catches case where whitespace follows hyphen
-        } else {
-            if(lastChar == '-') {
-                prependSpaces = 1;
-            }
         }
     }
+    outf << endl;
     
     //returns 1 if token longer than lineLength is found
     if(bad) {
@@ -167,13 +135,6 @@ int render(int lineLength, istream& inf, ostream& outf) {
 int main()
 {
     ifstream infile("/Users/brandon/IDEs/XCode/cs_31/project_5/project_5/in");
-    if(!infile) {
-        cerr << "NO INPUT" << endl;
-    }
     ofstream outfile("/Users/brandon/IDEs/XCode/cs_31/project_5/project_5/out");
-    if(!infile) {
-        cerr << "NO OUTPUT" << endl;
-    }
-    int len = 40;
-    return render(len, infile, outfile);
+    return render(40, infile, outfile);
 }
