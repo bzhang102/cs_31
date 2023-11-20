@@ -61,25 +61,58 @@ b. Description:
 		return the state of the program
 
 c. Test Cases:
-	//MARK: invalid lineLength
-	assert(testRender(0, "Hello", "", 2)); //max length can't be 0
-	assert(testRender(-10, "Hello", "", 2)); //max length can't be negative
-	
-	//MARK: basic test case
-    	assert(testRender(5, " ", "Hello\n", 0));
+    //MARK: invalid lineLength
+    assert(testRender(0, "Hello", "", 2)); //max length can't be 0
+    assert(testRender(-10, "Hello", "", 2)); //max length can't be negative
 
-	//MARK: leading or trailing whitespace
-	assert(testRender(100, " Hello", "Hello\n", 0)); //leading space
-	assert(testRender(100, "Hello ", "Hello\n", 0)); //trailing space
-	assert(testRender(100, "\nHello", "Hello\n", 0)); //leading line break
-	assert(testRender(100, "Hello\n", "Hello\n", 0)); //trailing line break
-	assert(testRender(100, "\tHello", "Hello\n", 0)); //leading tab
-	assert(testRender(100, "Hello\t", "Hello\n", 0)); //trailing tab
-	assert(testRender(100, "@P@ Hello\n", "Hello\n", 0)); //leading paragraph break
-	assert(testRender(100, "Hello @P@", "Hello\n", 0)); //trailing paragraph break
+    //MARK: basic test case
+    assert(testRender(5, "Hello", "Hello\n", 0));
 
-	//Mark: 
+    //MARK: leading or trailing whitespace
+    assert(testRender(15, " asdf", "asdf\n", 0)); //leading space
+    assert(testRender(15, "asdf ", "asdf\n", 0)); //trailing space
+    assert(testRender(15, "\nasdf", "asdf\n", 0)); //leading line break
+    assert(testRender(15, "asdf\n", "asdf\n", 0)); //trailing line break
+    assert(testRender(15, "     \n\n\n\n\n\nHello", "Hello\n", 0)); //multiple leading line breaks
+    assert(testRender(15, "Hello\n\n\n\n\n\n     ", "Hello\n", 0)); //multiple trailing line breaks
 
+    //MARK: word splitting
+    assert(testRender(40, "It always does seem to me that I am doing more work than\nI should do. It is not that I object to the work, mind you;\nI like work: it fascinates me.       I can sit and look at it for hours.\nI love to keep     it by me: the idea of getting\nrid\nof it nearly breaks my heart. @P@ You cannot give me too\nmuch work; to accumulate work has almost become\n\n\na passion with me: my study is so full of it now, that there is hardly\nan inch of room for any more.", "It always does seem to me that I am\ndoing more work than I should do.  It is\nnot that I object to the work, mind you;\nI like work:  it fascinates me.  I can\nsit and look at it for hours.  I love to\nkeep it by me:  the idea of getting rid\nof it nearly breaks my heart.\n\nYou cannot give me too much work; to\naccumulate work has almost become a\npassion with me:  my study is so full of\nit now, that there is hardly an inch of\nroom for any more.\n", 0)); //multiple word splitting tests that cover most cases
+
+    //MARK: hyphens
+    assert(testRender(10, "Thames so-called Henley-on-Thames so--called so- -so\n", "Thames so-\ncalled\nHenley-on-\nThames so-\n-called\nso- -so\n", 0)); //multiple hyphen tests
+    assert(testRender(10, "asdf-asdf", "asdf-asdf\n", 0)); //hyphen token fits on one line
+    assert(testRender(6, "asdf-asdf", "asdf-\nasdf\n", 0)); //hyphen token that needs splitting
+    assert(testRender(6, "asdf-asdf-asdf", "asdf-\nasdf-\nasdf\n", 0)); //multiple hyphen tokens
+    assert(testRender(12, "asdf-asdf-asdf", "asdf-asdf-\nasdf\n", 0)); //multiple hyphen tokens broken at second hyphen
+    assert(testRender(12, "asdf-asdf-asdf", "asdf-asdf-\nasdf\n", 0)); //multiple hyphen tokens broken at second hyphen
+    assert(testRender(15, "asdf- asdf", "asdf- asdf\n", 0)); //hyphens split by space
+    assert(testRender(15, "asdf-  asdf", "asdf- asdf\n", 0)); //hyphens split by multiple spaces
+    assert(testRender(5, "----------", "-----\n-----\n", 0)); //only hyphens
+    assert(testRender(5, "- - - - - - - - - -", "- - -\n- - -\n- - -\n-\n", 0)); //hyphens with spaces
+
+    //MARK: paragraph breaks
+    assert(testRender(15, "asdf @P@ asdf", "asdf\n\nasdf\n", 0)); //basic case
+    assert(testRender(15, "@P@ asdf", "asdf\n", 0)); //leading breaks ignored
+    assert(testRender(15, "asdf @P@", "asdf\n", 0)); //trailing breaks ignored
+    assert(testRender(15, "asdf @P@ @P@ asdf", "asdf\n\nasdf\n", 0)); //multiple breaks ignored
+    assert(testRender(25, "asdf @P@@P@", "asdf @P@@P@\n", 0)); //only '@P@' is considered a break
+    assert(testRender(15, "@P@-@P@", "@P@-@P@\n", 0)); //with hyphen
+    assert(testRender(4, "@P@-@P@", "@P@-\n@P@\n", 0)); //breaks at hyphen but doesnt not paragraph break
+    assert(testRender(2, "as @P@ df", "as\n\ndf\n", 0)); //length less than length of break token
+
+    //MARK: error code 1 cases
+    assert(testRender(15, "asdfasdfasdfasdfasdf", "asdfasdfasdfasd\nfasdf\n", 1)); //basic case
+    assert(testRender(4, "asdfasdfasdfasdfasdf", "asdf\nasdf\nasdf\nasdf\nasdf\n", 1)); //split to multiple lines
+    assert(testRender(4, "asdfasdfasdfasdfasdf", "asdf\nasdf\nasdf\nasdf\nasdf\n", 1)); //split to multiple lines
+    assert(testRender(5, "asdf-asdfasdf--asdf asdf", "asdf-\nasdfa\nsdf--\nasdf\nasdf\n", 1)); //with hyphens
+    assert(testRender(6, "asdf!-asdfasdf!-asdf asdf", "asdf!-\nasdfas\ndf!-\nasdf\nasdf\n", 1)); //with hyphens and punctuation
+
+    //MARK: misc
+    assert(testRender(15, "", "", 0)); //empty input
+    assert(testRender(15, "@P@ @P@ @P@", "", 0)); //only breaks
+    assert(testRender(179, "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasd", "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasd\n", 0)); //179 character long token
+    assert(testRender(500, "It always does seem to me that I am doing more work than\nI should do. It is not that I object to the work, mind you;\nI like work: it fascinates me.       I can sit and look at it for hours.\nI love to keep     it by me: the idea of getting\nrid\nof it nearly breaks my heart. @P@ You cannot give me too\nmuch work; to accumulate work has almost become\n\n\na passion with me: my study is so full of it now, that there is hardly\nan inch of room for any more.", "It always does seem to me that I am doing more work than I should do.  It is not that I object to the work, mind you; I like work:  it fascinates me.  I can sit and look at it for hours.  I love to keep it by me:  the idea of getting rid of it nearly breaks my heart.\n\nYou cannot give me too much work; to accumulate work has almost become a passion with me:  my study is so full of it now, that there is hardly an inch of room for any more.\n", 0)); //long output line (EXTRA CREDIT CASE)
 
 
 
