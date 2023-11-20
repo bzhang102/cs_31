@@ -2,43 +2,84 @@
 Yuxiang Zhang
 
 a. Obstacles:
-	For me at least, this project was deceptively easy... I thought I finished my project 
-	in a single sitting of three hours, only to go back the next day and discover that I had 
-	numerous small, but critical flaws in my errors including, but not limited to:
+	For me at least, this project was deceptively easy... I thought I finished my project in a single sitting of three hours, only to go back the next day and discover that I had numerous small, but critical flaws in my errors including, but not limited to:
 		1. Not handling leading and trailing paragraph breaks properly
 			i. Fixed by prepending breaks, much like what is done with spaces
 		2. Not handling hyphens correctly when they are not trailed by spaces
 			ii. Fixed by handling empty tokens after hyphens differently
+	These two bugs required me to completely rewrite my code... twice, which I duly did (for some reason, my brain works pretty well at 4 am).
+
 b. Description:
 
-	getToken(): (helper function)
+	void getToken(): (helper function that reads from inf and returns tokens)
 		while istream is not in error state (not at end of file), repeatedly:
 			reads current character
+			assigns end of file tracker to true if file end reached
 			if character is:
 				normal character: appends and continues reading
-				hyphen: appends hyphen to token and returns false (end of file not reached)
 				whitespace: returns without appending to token (end of file not reached)
 		if loop exited, return true (end of file reached)
 
-	render():
+	bool hyphenate(): (helper function that attempts to find a hyphen and render the word portions independently)
+		declare two empty cstrings for two word portions
+		read first word portion up to and including hyphen into first cstring
+		read second word portion into second cstring
+		if the word was broken up successfully:
+			call corresponding render helper function (see below) with word portion 1
+			call corresponding render helper function (see below) with word portion 2
+			return true for successful hyphenation
+		else:
+			return false for no hyphen found
+
+	void renderInSize(): (helper function that renders token shorter than line length)
+		if token fits on current line
+			render spaces, then token
+		else:
+			if hyphenation fails:
+				render on new line without spaces
+				
+	
+	void renderOutSize(): (helper function that renders token longer than line length)
+		if hyphenation fails:
+			start a new line if characters have already been printed on the current one
+			render oversize token character by character, starting new lines as necessary
+			set state to 1
+
+	int render():
 		return 2 if lineLength is invalid
 		repeatedly:
-			reads next token using getToken, and breaks if end of file reached
+			reads next token using getToken
 			if token is not empty:
 				if token is a @P@ (paragraph break):
 					determine if a paragraph break should be printed before the next token
-				else if the token is longer than the line length:
-					prepend spaces on current line if they fit, or else scrap all of them and start new line
-					render the token character by character, starting new lines as needed
-					set error state to 1 and return 1 at the end of render()
-				else (token is valid length and not paragraph break):
-					if the token fits on this line:
-						prepend spaces and render token
-					else (token does not fit):
-						start new line and render token
-				determine the number of spaces to be prepended to the next token
-			else:
-				if last character was a hyphen prepare to prepend a single space to the next token (case: asdf- asdf)
-		return 1 if a token longer than line length was found, else return 0
+				else
+					prepend break if applicable
+					render token by calling corresponding render helper for token length
+					prepare to prepend spaces to the next token according to last character of current token
+			if eof reached, break
+		if anything was printed, append a new line at the end of the file
+		return the state of the program
 
 c. Test Cases:
+	//MARK: invalid lineLength
+	assert(testRender(0, "Hello", "", 2)); //max length can't be 0
+	assert(testRender(-10, "Hello", "", 2)); //max length can't be negative
+	
+	//MARK: basic test case
+    	assert(testRender(5, " ", "Hello\n", 0));
+
+	//MARK: leading or trailing whitespace
+	assert(testRender(100, " Hello", "Hello\n", 0)); //leading space
+	assert(testRender(100, "Hello ", "Hello\n", 0)); //trailing space
+	assert(testRender(100, "\nHello", "Hello\n", 0)); //leading line break
+	assert(testRender(100, "Hello\n", "Hello\n", 0)); //trailing line break
+	assert(testRender(100, "\tHello", "Hello\n", 0)); //leading tab
+	assert(testRender(100, "Hello\t", "Hello\n", 0)); //trailing tab
+	assert(testRender(100, "@P@ Hello\n", "Hello\n", 0)); //leading paragraph break
+	assert(testRender(100, "Hello @P@", "Hello\n", 0)); //trailing paragraph break
+
+	//Mark: 
+
+
+
+
