@@ -1,0 +1,135 @@
+Yuxiang Zhang
+206142605
+1.
+	a.
+		int main()
+		{
+		    int arr[3] = { 5, 10, 15 };
+		    int* ptr = arr;
+
+		    *ptr = 30;          // set arr[0] to 30
+		    *(ptr + 1) = 20;      // set arr[1] to 20
+		    ptr += 2;
+		    *ptr = 10;        // set arr[2] to 10
+
+		    ptr = arr;
+		    while (ptr < arr + 3)
+		    {
+		        cout << *ptr << endl;    // print values
+		        ptr++;
+		    }
+		}
+	b.
+		The function finds the maximum as intended, but because pToMax is passed by value and not reference, the value of pToMax never actually changes in the main routine. This is the correct function header:
+			void findMax(int arr[], int n, int*& pToMax)
+	c. 
+		The main method contains an uninitialized pointer. To fix this, we need to declare an int to which the int* points to:
+			int main()
+			{
+			    int val;
+			    int* ptr = &val;
+			    computeCube(5, ptr);
+			    cout << "Five cubed is " << *ptr << endl;
+			}
+	d. 
+		The function implementation is mostly correct, but compares the values of the actual pointers, and not the values that the pointers reference. Here is the fix:
+			bool strequal(const char str1[], const char str2[])
+			{
+				while (*str1 != 0  &&  *str2 != 0)  // zero bytes at ends
+			    	{
+       					if (*str1 != *str2)  // compare corresponding characters
+						return false;
+        				str1++;            // advance to the next character
+        				str2++;
+    				}
+    				return *str1 == *str2;   // both ended at same time?
+			}
+	e.
+		The array referenced int getPtrToArray() becomes out of scope as f() is called, which will then fill the memory locations referenced by anArray with junk. When we try to access these memory locations through the pointer, we then get the aforementioned junk. Making anArray global should fix this issue.
+
+2. 
+	a. double* cat;
+	b. double mouse[5];
+	c. cat = &mouse[4];
+	d. *cat = 25;
+	e. *(mouse + 3) = 17;
+	f. cat -= 3;
+	g. cat[1] = 42;
+	h. cat[0] = 54;
+	i. bool d = *cat == mouse[0];
+	j. bool b = *cat == *(cat + 1);
+
+3. 
+	a.
+		double mean(const double* scores, int numScores)
+    		{
+		        double tot = 0;
+			int i = 0;
+	        	while (i < numScores)
+        		{
+		       		tot += *(scores + i);
+				i++;
+	        	}
+	        	return tot/numScores;
+		}
+	b.
+		const char* findTheChar(const char str[], char chr)
+		{
+    			for (int k = 0; *(str + k) != 0; k++) {
+        			if (*(str + k) == chr) {
+            				return &*(str + k);
+        			}
+    			}
+    			return nullptr;
+		}
+	c.
+		const char* findTheChar(const char str[], char chr)
+		{
+    			for (; *str != 0; str++) {
+        			if (*str == chr) {
+            				return str;
+				}
+			}
+    			return nullptr;
+		}
+
+4.
+	Going through each line of code in the main routine:
+	        int array[6] = { 5, 3, 4, 17, 22, 19 }; //Array declaration
+	
+	        int* ptr = maxwell(array, &array[2]); //Returns a pointer to the first element in array (the pointer with the maximum value referenced)
+	        *ptr = -1; //assigns -1 to that address (array now looks like { -1, 3, 4, 17, 22, 19 })
+	        ptr += 2; //moves pointer two indexes forward
+	        ptr[1] = 9; //assigns 9 to address one behind pointer's current address (array now looks like { -1, 3, 4, 9, 22, 19 })
+	        *(array+1) = 79; //assigns 79 to address one behind pointer to first element in array (array now looks like { -1, 79, 4, 9, 22, 19 })
+	
+	        cout << &array[5] - ptr << endl; //prints the difference between a pointer to the 5th element (5) and ptr (2), which is 3
+		
+	        swap1(&array[0], &array[1]); //swaps the pointers to the values at 0 and 1 (does nothing to array)
+	        swap2(array, &array[2]); //swaps the values at index 0 and index 2 (array now looks like { 4, 79, -1, 9, 22, 19 })
+	
+	        for (int i = 0; i < 6; i++) //iterates through array and prints out each value
+	        	cout << array[i] << endl;
+
+	Final output is:
+		3
+		4
+`		79
+		-1
+		9
+		22
+		19
+
+5.
+	void removeS(char* ptr) {
+    		while(*ptr != 0) {
+        		if(*ptr == 's' || *ptr == 'S') {
+            			for(char* shift = ptr; *shift != 0; shift++) {
+                			*shift = *(shift + 1);
+            			}
+        		} else {
+            			ptr++;
+        		}
+    		}
+	}
+		

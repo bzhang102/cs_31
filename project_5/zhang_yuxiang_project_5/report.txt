@@ -1,0 +1,118 @@
+206142605
+Yuxiang Zhang
+
+a. Obstacles:
+	For me at least, this project was deceptively easy... I thought I finished my project in a single sitting of three hours, only to go back the next day and discover that I had numerous small, but critical flaws in my errors including, but not limited to:
+		1. Not handling leading and trailing paragraph breaks properly
+			i. Fixed by prepending breaks, much like what is done with spaces
+		2. Not handling hyphens correctly when they are not trailed by spaces
+			ii. Fixed by handling empty tokens after hyphens differently
+	These two bugs required me to completely rewrite my code... twice, which I duly did (for some reason, my brain works pretty well at 4 am).
+
+b. Description:
+
+	void getToken(): (helper function that reads from inf and returns tokens)
+		while istream is not in error state (not at end of file), repeatedly:
+			reads current character
+			assigns end of file tracker to true if file end reached
+			if character is:
+				normal character: appends and continues reading
+				whitespace: returns without appending to token (end of file not reached)
+		if loop exited, return true (end of file reached)
+
+	bool hyphenate(): (helper function that attempts to find a hyphen and render the word portions independently)
+		declare two empty cstrings for two word portions
+		read first word portion up to and including hyphen into first cstring
+		read second word portion into second cstring
+		if the word was broken up successfully:
+			call corresponding render helper function (see below) with word portion 1
+			call corresponding render helper function (see below) with word portion 2
+			return true for successful hyphenation
+		else:
+			return false for no hyphen found
+
+	void renderInSize(): (helper function that renders token shorter than line length)
+		if token fits on current line
+			render spaces, then token
+		else:
+			if hyphenation fails:
+				render on new line without spaces
+				
+	
+	void renderOutSize(): (helper function that renders token longer than line length)
+		if hyphenation fails:
+			start a new line if characters have already been printed on the current one
+			render oversize token character by character, starting new lines as necessary
+			set state to 1
+
+	int render():
+		return 2 if lineLength is invalid
+		repeatedly:
+			reads next token using getToken
+			if token is not empty:
+				if token is a @P@ (paragraph break):
+					determine if a paragraph break should be printed before the next token
+				else
+					prepend break if applicable
+					render token by calling corresponding render helper for token length
+					prepare to prepend spaces to the next token according to last character of current token
+			if eof reached, break
+		if anything was printed, append a new line at the end of the file
+		return the state of the program
+
+c. Test Cases:
+    //MARK: invalid lineLength
+    assert(testRender(0, "Hello", "", 2)); //max length can't be 0
+    assert(testRender(-10, "Hello", "", 2)); //max length can't be negative
+
+    //MARK: basic test case
+    assert(testRender(5, "Hello", "Hello\n", 0));
+
+    //MARK: leading or trailing whitespace
+    assert(testRender(15, " asdf", "asdf\n", 0)); //leading space
+    assert(testRender(15, "asdf ", "asdf\n", 0)); //trailing space
+    assert(testRender(15, "\nasdf", "asdf\n", 0)); //leading line break
+    assert(testRender(15, "asdf\n", "asdf\n", 0)); //trailing line break
+    assert(testRender(15, "     \n\n\n\n\n\nHello", "Hello\n", 0)); //multiple leading line breaks
+    assert(testRender(15, "Hello\n\n\n\n\n\n     ", "Hello\n", 0)); //multiple trailing line breaks
+
+    //MARK: word splitting
+    assert(testRender(40, "It always does seem to me that I am doing more work than\nI should do. It is not that I object to the work, mind you;\nI like work: it fascinates me.       I can sit and look at it for hours.\nI love to keep     it by me: the idea of getting\nrid\nof it nearly breaks my heart. @P@ You cannot give me too\nmuch work; to accumulate work has almost become\n\n\na passion with me: my study is so full of it now, that there is hardly\nan inch of room for any more.", "It always does seem to me that I am\ndoing more work than I should do.  It is\nnot that I object to the work, mind you;\nI like work:  it fascinates me.  I can\nsit and look at it for hours.  I love to\nkeep it by me:  the idea of getting rid\nof it nearly breaks my heart.\n\nYou cannot give me too much work; to\naccumulate work has almost become a\npassion with me:  my study is so full of\nit now, that there is hardly an inch of\nroom for any more.\n", 0)); //multiple word splitting tests that cover most cases
+
+    //MARK: hyphens
+    assert(testRender(10, "Thames so-called Henley-on-Thames so--called so- -so\n", "Thames so-\ncalled\nHenley-on-\nThames so-\n-called\nso- -so\n", 0)); //multiple hyphen tests
+    assert(testRender(10, "asdf-asdf", "asdf-asdf\n", 0)); //hyphen token fits on one line
+    assert(testRender(6, "asdf-asdf", "asdf-\nasdf\n", 0)); //hyphen token that needs splitting
+    assert(testRender(6, "asdf-asdf-asdf", "asdf-\nasdf-\nasdf\n", 0)); //multiple hyphen tokens
+    assert(testRender(12, "asdf-asdf-asdf", "asdf-asdf-\nasdf\n", 0)); //multiple hyphen tokens broken at second hyphen
+    assert(testRender(12, "asdf-asdf-asdf", "asdf-asdf-\nasdf\n", 0)); //multiple hyphen tokens broken at second hyphen
+    assert(testRender(15, "asdf- asdf", "asdf- asdf\n", 0)); //hyphens split by space
+    assert(testRender(15, "asdf-  asdf", "asdf- asdf\n", 0)); //hyphens split by multiple spaces
+    assert(testRender(5, "----------", "-----\n-----\n", 0)); //only hyphens
+    assert(testRender(5, "- - - - - - - - - -", "- - -\n- - -\n- - -\n-\n", 0)); //hyphens with spaces
+
+    //MARK: paragraph breaks
+    assert(testRender(15, "asdf @P@ asdf", "asdf\n\nasdf\n", 0)); //basic case
+    assert(testRender(15, "@P@ asdf", "asdf\n", 0)); //leading breaks ignored
+    assert(testRender(15, "asdf @P@", "asdf\n", 0)); //trailing breaks ignored
+    assert(testRender(15, "asdf @P@ @P@ asdf", "asdf\n\nasdf\n", 0)); //multiple breaks ignored
+    assert(testRender(25, "asdf @P@@P@", "asdf @P@@P@\n", 0)); //only '@P@' is considered a break
+    assert(testRender(15, "@P@-@P@", "@P@-@P@\n", 0)); //with hyphen
+    assert(testRender(4, "@P@-@P@", "@P@-\n@P@\n", 0)); //breaks at hyphen but doesnt not paragraph break
+    assert(testRender(2, "as @P@ df", "as\n\ndf\n", 0)); //length less than length of break token
+
+    //MARK: error code 1 cases
+    assert(testRender(15, "asdfasdfasdfasdfasdf", "asdfasdfasdfasd\nfasdf\n", 1)); //basic case
+    assert(testRender(4, "asdfasdfasdfasdfasdf", "asdf\nasdf\nasdf\nasdf\nasdf\n", 1)); //split to multiple lines
+    assert(testRender(4, "asdfasdfasdfasdfasdf", "asdf\nasdf\nasdf\nasdf\nasdf\n", 1)); //split to multiple lines
+    assert(testRender(5, "asdf-asdfasdf--asdf asdf", "asdf-\nasdfa\nsdf--\nasdf\nasdf\n", 1)); //with hyphens
+    assert(testRender(6, "asdf!-asdfasdf!-asdf asdf", "asdf!-\nasdfas\ndf!-\nasdf\nasdf\n", 1)); //with hyphens and punctuation
+
+    //MARK: misc
+    assert(testRender(15, "", "", 0)); //empty input
+    assert(testRender(15, "@P@ @P@ @P@", "", 0)); //only breaks
+    assert(testRender(179, "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasd", "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasd\n", 0)); //179 character long token
+    assert(testRender(500, "It always does seem to me that I am doing more work than\nI should do. It is not that I object to the work, mind you;\nI like work: it fascinates me.       I can sit and look at it for hours.\nI love to keep     it by me: the idea of getting\nrid\nof it nearly breaks my heart. @P@ You cannot give me too\nmuch work; to accumulate work has almost become\n\n\na passion with me: my study is so full of it now, that there is hardly\nan inch of room for any more.", "It always does seem to me that I am doing more work than I should do.  It is not that I object to the work, mind you; I like work:  it fascinates me.  I can sit and look at it for hours.  I love to keep it by me:  the idea of getting rid of it nearly breaks my heart.\n\nYou cannot give me too much work; to accumulate work has almost become a passion with me:  my study is so full of it now, that there is hardly an inch of room for any more.\n", 0)); //long output line (EXTRA CREDIT CASE)
+
+
+

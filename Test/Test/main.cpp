@@ -1,11 +1,12 @@
 #include <iostream>
 
 using namespace std;
+int asdf;
+
+void test(int x) {
+    int arr[x];
+}
 
 int main() {
-    string s1 = "Hello ";
-    string s2 = "World!";
-    cout << s1 + s2 << endl;
-    
-    return 0;
+    int array[asdf];
 }
