@@ -2,15 +2,15 @@
 using namespace std;
 
 void removeS(char* ptr) {
+    char* safe = ptr;
     while(*ptr != 0) {
-        if(*ptr == 's' || *ptr == 'S') {
-            for(char* shift = ptr; *shift != 0; shift++) {
-                *shift = *(shift + 1);
-            }
-        } else {
-            ptr++;
+        if(*ptr != 's' && *ptr != 'S') {
+            *safe = *ptr;
+            safe++;
         }
+        ptr++;
     }
+    *safe = 0;
 }
 
 int main()
