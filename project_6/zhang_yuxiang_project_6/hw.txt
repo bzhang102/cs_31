@@ -46,7 +46,7 @@ Yuxiang Zhang
                 return *str1 == *str2;   // both ended at same time?
 			}
 	e.
-		The array referenced int getPtrToArray() becomes out of scope as f() is called, which will then fill the memory locations referenced by anArray with junk. When we try to access these memory locations through the pointer, we then get undefined behavior. Making anArray global should fix this issue.
+		The array referenced int getPtrToArray() becomes out of scope as f() is called, which will then fill the memory locations referenced by anArray with junk. When we try to access these memory locations through the pointer, we then get the aforementioned junk. Making anArray global should fix this issue.
 
 2.
 	a. double* cat;
@@ -74,7 +74,7 @@ Yuxiang Zhang
             return tot/numScores;
 		}
 	b.
-		const char* findTheChar(const char* str, char chr)
+		const char* findTheChar(const char str[], char chr)
 		{
             for (int k = 0; *(str + k) != 0; k++) {
                 if (*(str + k) == chr) {
@@ -84,7 +84,7 @@ Yuxiang Zhang
             return nullptr;
 		}
 	c.
-		const char* findTheChar(const char* str, char chr)
+		const char* findTheChar(const char str[], char chr)
 		{
             for (; *str != 0; str++) {
                 if (*str == chr) {
