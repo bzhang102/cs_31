@@ -175,7 +175,7 @@ Player::Player(City* cp, int r, int c) {
     m_row = r;
     m_col = c;
     m_age = 0;
-    m_health = 12;
+    m_health = 100;
 }
 
 int Player::row() const {
@@ -205,7 +205,13 @@ void Player::preach() {
 
 void Player::move(int dir) {
     m_age++;
-    if(m_city->nTootersAt(m_row, m_col) != 0) {
+    if(dir == UP && m_city->nTootersAt(m_row - 1, m_col) == 0) {
+        m_city->determineNewPosition(m_row, m_col, dir);
+    } else if(dir == DOWN && m_city->nTootersAt(m_row + 1, m_col) == 0) {
+        m_city->determineNewPosition(m_row, m_col, dir);
+    } else if(dir == LEFT && m_city->nTootersAt(m_row, m_col - 1) == 0) {
+        m_city->determineNewPosition(m_row, m_col, dir);
+    } else if(dir == RIGHT && m_city->nTootersAt(m_row, m_col + 1) == 0) {
         m_city->determineNewPosition(m_row, m_col, dir);
     }
 }
@@ -316,7 +322,7 @@ void City::display() const {
 
     // Indicate each Tooter's position
     for(int i = 0; i < m_nTooters; i++) {
-        char& curr = grid[m_tooters[i]->row()][m_tooters[i]->col()];
+        char& curr = grid[m_tooters[i]->row() - 1][m_tooters[i]->col() - 1];
         if(curr == '.') {
             curr = 'T';
         } else if(curr == 'T') {
@@ -404,9 +410,20 @@ bool City::addPlayer(int r, int c) {
 
 void City::preachToTootersAroundPlayer() {
     // Preach to Tooters orthogonally or diagonally adjacent to player.
-    // ifa Tooter is converted, destroy it and remove it from the city,
+    // if a Tooter is converted, destroy it and remove it from the city,
     // since we have no further need to display it or have it interact with
     // the player.
+    for(int i = 0; i < m_nTooters; i++) {
+        if(abs(m_tooters[i]->row() - m_player->row()) <= 1 && abs(m_tooters[i]->col() - m_player->col()) <= 1) {
+            if(randInt(1,9) <= 6) {
+                for(int j = i; j < m_nTooters - 1; j++) {
+                    m_tooters[j] = m_tooters[j + 1];
+                }
+                m_tooters[m_nTooters - 1] = nullptr;
+                m_nTooters--;
+            }
+        }
+    }
 
     // TODO:  Implement this.
 }
@@ -456,7 +473,7 @@ Game::Game(int rows, int cols, int nTooters) {
         int r = randInt(1, rows);
         int c = randInt(1, cols);
         // Don't put a Tooter where the player is
-        if(r == rPlayer  &&  c == cPlayer) {
+        if(r == rPlayer && c == cPlayer) {
             continue;
         }
         m_city->addTooter(r, c);
