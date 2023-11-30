@@ -9,9 +9,9 @@ using namespace std;
 // Manifest constants
 ///////////////////////////////////////////////////////////////////////////
 
-const int MAXROWS = 20;               // max number of rows in a city
-const int MAXCOLS = 30;               // max number of columns in a city
-const int MAXTOOTERS = 125;           // max number of Tooters allowed
+const int MAXROWS = 20; // max number of rows in a city
+const int MAXCOLS = 30; // max number of columns in a city
+const int MAXTOOTERS = 125; // max number of Tooters allowed
 
 const int UP = 0;
 const int DOWN = 1;
@@ -414,7 +414,8 @@ void City::preachToTootersAroundPlayer() {
     // since we have no further need to display it or have it interact with
     // the player.
     for(int i = 0; i < m_nTooters; i++) {
-        if(abs(m_tooters[i]->row() - m_player->row()) <= 1 && abs(m_tooters[i]->col() - m_player->col()) <= 1) {
+        if((abs(m_tooters[i]->row() - m_player->row()) <= 1 && (m_tooters[i]->col() - m_player->col() == 0)) || (abs(m_tooters[i]->col() - m_player->col()) <= 1 && (m_tooters[i]->row() - m_player->row() == 0))) {
+            // 2/3 chance to convert this tooter
             if(randInt(1,9) <= 6) {
                 for(int j = i; j < m_nTooters - 1; j++) {
                     m_tooters[j] = m_tooters[j + 1];
@@ -424,14 +425,12 @@ void City::preachToTootersAroundPlayer() {
             }
         }
     }
-
-    // TODO:  Implement this.
 }
 
 void City::moveTooters() {
     for(int i = 0; i < m_nTooters; i++) {
         m_tooters[i]->move();
-        if(abs(m_tooters[i]->row() - m_player->row()) <= 1 && abs(m_tooters[i]->col() - m_player->col()) <= 1) {
+        if((abs(m_tooters[i]->row() - m_player->row()) <= 1 && (m_tooters[i]->col() - m_player->col() == 0)) || (abs(m_tooters[i]->col() - m_player->col()) <= 1 && (m_tooters[i]->row() - m_player->row() == 0))) {
             m_player->getGassed();
         }
     }
@@ -555,7 +554,7 @@ int randInt(int min, int max) {
 int main() {
     // Create a game
     // Use this instead to create a mini-game:   Game g(3, 4, 2);
-    Game g(7, 8, 25);
+    Game g(1, 2, 10);
 
     // Play the game
     g.play();
