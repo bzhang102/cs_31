@@ -417,11 +417,12 @@ void City::preachToTootersAroundPlayer() {
         if((abs(m_tooters[i]->row() - m_player->row()) <= 1 && (m_tooters[i]->col() - m_player->col() == 0)) || (abs(m_tooters[i]->col() - m_player->col()) <= 1 && (m_tooters[i]->row() - m_player->row() == 0))) {
             // 2/3 chance to convert this tooter
             if(randInt(1,9) <= 6) {
-                for(int j = i; j < m_nTooters - 1; j++) {
+                delete m_tooters[i];
+                m_nTooters--;
+                for(int j = i; j < m_nTooters; j++) {
                     m_tooters[j] = m_tooters[j + 1];
                 }
-                m_tooters[m_nTooters - 1] = nullptr;
-                m_nTooters--;
+                m_tooters[m_nTooters] = nullptr;
             }
         }
     }
@@ -554,7 +555,7 @@ int randInt(int min, int max) {
 int main() {
     // Create a game
     // Use this instead to create a mini-game:   Game g(3, 4, 2);
-    Game g(1, 2, 10);
+    Game g(7, 8, 10);
 
     // Play the game
     g.play();
