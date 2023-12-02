@@ -175,7 +175,7 @@ Player::Player(City* cp, int r, int c) {
     m_row = r;
     m_col = c;
     m_age = 0;
-    m_health = 100;
+    m_health = 12;
 }
 
 int Player::row() const {
@@ -414,7 +414,8 @@ void City::preachToTootersAroundPlayer() {
     // since we have no further need to display it or have it interact with
     // the player.
     for(int i = 0; i < m_nTooters; i++) {
-        if((abs(m_tooters[i]->row() - m_player->row()) <= 1 && (m_tooters[i]->col() - m_player->col() == 0)) || (abs(m_tooters[i]->col() - m_player->col()) <= 1 && (m_tooters[i]->row() - m_player->row() == 0))) {
+        //if orthogonally or diagonally adjacent
+        if(abs(m_tooters[i]->row() - m_player->row()) <= 1 && abs(m_tooters[i]->col() - m_player->col()) <= 1) {
             // 2/3 chance to convert this tooter
             if(randInt(1,9) <= 6) {
                 delete m_tooters[i];
@@ -431,7 +432,9 @@ void City::preachToTootersAroundPlayer() {
 void City::moveTooters() {
     for(int i = 0; i < m_nTooters; i++) {
         m_tooters[i]->move();
-        if((abs(m_tooters[i]->row() - m_player->row()) <= 1 && (m_tooters[i]->col() - m_player->col() == 0)) || (abs(m_tooters[i]->col() - m_player->col()) <= 1 && (m_tooters[i]->row() - m_player->row() == 0))) {
+        //if orthogonally adjacent
+        if((abs(m_tooters[i]->row() - m_player->row()) <= 1 && (m_tooters[i]->col() == m_player->col())) ||
+           (abs(m_tooters[i]->col() - m_player->col()) <= 1 && (m_tooters[i]->row() == m_player->row()))) {
             m_player->getGassed();
         }
     }
@@ -554,7 +557,7 @@ int randInt(int min, int max) {
 
 int main() {
     // Create a game
-    // Use this instead to create a mini-game:   Game g(3, 4, 2);
+//    Game g(3, 4, 2);
     Game g(7, 8, 10);
 
     // Play the game
