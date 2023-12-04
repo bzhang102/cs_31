@@ -146,14 +146,12 @@ void Tooter::move() {
     // Attempt to move in a random direction; if nit can't move, don't move.
     // if the player is there, don't move.
     int dir = randInt(0, NUMDIRS-1);  // dir is now UP, DOWN, LEFT, or RIGHT
-    if(dir == UP && !m_city->isPlayerAt(m_row - 1, m_col)) {
-        m_city->determineNewPosition(m_row, m_col, dir);
-    } else if(dir == DOWN && !m_city->isPlayerAt(m_row + 1, m_col)) {
-        m_city->determineNewPosition(m_row, m_col, dir);
-    } else if(dir == LEFT && !m_city->isPlayerAt(m_row, m_col - 1)) {
-        m_city->determineNewPosition(m_row, m_col, dir);
-    } else if(dir == RIGHT && !m_city->isPlayerAt(m_row, m_col + 1)) {
-        m_city->determineNewPosition(m_row, m_col, dir);
+    int newRow = m_row;
+    int newCol = m_col;
+    m_city->determineNewPosition(newRow, newCol, dir);
+    if(!m_city->isPlayerAt(newRow, newCol)) {
+        m_row = newRow;
+        m_col = newCol;
     }
 }
 
@@ -205,14 +203,12 @@ void Player::preach() {
 
 void Player::move(int dir) {
     m_age++;
-    if(dir == UP && m_city->nTootersAt(m_row - 1, m_col) == 0) {
-        m_city->determineNewPosition(m_row, m_col, dir);
-    } else if(dir == DOWN && m_city->nTootersAt(m_row + 1, m_col) == 0) {
-        m_city->determineNewPosition(m_row, m_col, dir);
-    } else if(dir == LEFT && m_city->nTootersAt(m_row, m_col - 1) == 0) {
-        m_city->determineNewPosition(m_row, m_col, dir);
-    } else if(dir == RIGHT && m_city->nTootersAt(m_row, m_col + 1) == 0) {
-        m_city->determineNewPosition(m_row, m_col, dir);
+    int newRow = m_row;
+    int newCol = m_col;
+    m_city->determineNewPosition(newRow, newCol, dir);
+    if(m_city->nTootersAt(newRow, newCol) == 0) {
+        m_row = newRow;
+        m_col = newCol;
     }
 }
 
@@ -417,7 +413,7 @@ void City::preachToTootersAroundPlayer() {
         //if orthogonally or diagonally adjacent
         if(abs(m_tooters[i]->row() - m_player->row()) <= 1 && abs(m_tooters[i]->col() - m_player->col()) <= 1) {
             // 2/3 chance to convert this tooter
-            if(randInt(1,9) <= 6) {
+            if(randInt(1,3) != 3) {
                 delete m_tooters[i];
                 m_nTooters--;
                 for(int j = i; j < m_nTooters; j++) {
@@ -435,7 +431,6 @@ void City::moveTooters() {
         //if orthogonally adjacent
         if((abs(m_tooters[i]->row() - m_player->row()) <= 1 && (m_tooters[i]->col() == m_player->col())) ||
            (abs(m_tooters[i]->col() - m_player->col()) <= 1 && (m_tooters[i]->row() == m_player->row()))) {
-            m_player->getGassed();
         }
     }
 }
@@ -558,7 +553,7 @@ int randInt(int min, int max) {
 int main() {
     // Create a game
 //    Game g(3, 4, 2);
-    Game g(7, 8, 10);
+    Game g(2, 2, 5);
 
     // Play the game
     g.play();
