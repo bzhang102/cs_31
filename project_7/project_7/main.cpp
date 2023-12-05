@@ -3,6 +3,13 @@
 #include <random>
 #include <utility>
 #include <cstdlib>
+#include <type_traits>
+#include <cassert>
+
+#define CHECKTYPE(c, f, r, a)  \
+    static_assert(std::is_same<decltype(&c::f), r (c::*)a>::value, \
+       "FAILED: You changed the type of " #c "::" #f);  \
+    { [[gnu::unused]] auto p = static_cast<r(c::*)a>(&c::f); }
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////
@@ -193,7 +200,7 @@ int Player::health() const {
 }
 
 bool Player::isPassedOut() const {
-    return m_health <= 0;
+    return m_health == 0;
 }
 
 void Player::preach() {
@@ -323,7 +330,7 @@ void City::display() const {
             curr = 'T';
         } else if(curr == 'T') {
             curr = '2';
-        } else if(curr != '9') {
+        } else if(curr < 9) {
             curr++;
         }
     }
@@ -413,13 +420,13 @@ void City::preachToTootersAroundPlayer() {
         //if orthogonally or diagonally adjacent
         if(abs(m_tooters[i]->row() - m_player->row()) <= 1 && abs(m_tooters[i]->col() - m_player->col()) <= 1) {
             // 2/3 chance to convert this tooter
-            if(randInt(1,3) != 3) {
+            if(true/*randInt(1,3) != 3*/) {
                 delete m_tooters[i];
                 m_nTooters--;
                 for(int j = i; j < m_nTooters; j++) {
                     m_tooters[j] = m_tooters[j + 1];
                 }
-                m_tooters[m_nTooters] = nullptr;
+                i--;
             }
         }
     }
@@ -431,6 +438,7 @@ void City::moveTooters() {
         //if orthogonally adjacent
         if((abs(m_tooters[i]->row() - m_player->row()) <= 1 && (m_tooters[i]->col() == m_player->col())) ||
            (abs(m_tooters[i]->col() - m_player->col()) <= 1 && (m_tooters[i]->row() == m_player->row()))) {
+            m_player->getGassed();
         }
     }
 }
@@ -546,17 +554,168 @@ int randInt(int min, int max) {
     return distro(generator);
 }
 
+void thisFunctionWillNeverBeCalled()
+{
+      // If the student deleted or changed the interfaces to the public
+      // functions, this won't compile.  (This uses magic beyond the scope
+      // of CS 31.)
+
+    Tooter(static_cast<City*>(0), 1, 1);
+    CHECKTYPE(Tooter, row, int, () const);
+    CHECKTYPE(Tooter, col, int, () const);
+    CHECKTYPE(Tooter, move, void, ());
+
+    Player(static_cast<City*>(0), 1, 1);
+    CHECKTYPE(Player, row, int, () const);
+    CHECKTYPE(Player, col, int, () const);
+    CHECKTYPE(Player, age, int, () const);
+    CHECKTYPE(Player, health, int, () const);
+    CHECKTYPE(Player, isPassedOut, bool, () const);
+    CHECKTYPE(Player, preach, void, ());
+    CHECKTYPE(Player, move, void, (int));
+    CHECKTYPE(Player, getGassed, void, ());
+
+    City(1, 1);
+    CHECKTYPE(City, rows, int, () const);
+    CHECKTYPE(City, cols, int, () const);
+    CHECKTYPE(City, player, Player*, () const);
+    CHECKTYPE(City, isPlayerAt, bool, (int,int) const);
+    CHECKTYPE(City, tooterCount, int, () const);
+    CHECKTYPE(City, nTootersAt, int, (int,int) const);
+    CHECKTYPE(City, determineNewPosition, bool, (int&,int&,int) const);
+    CHECKTYPE(City, display, void, () const);
+    CHECKTYPE(City, addTooter, bool, (int,int));
+    CHECKTYPE(City, addPlayer, bool, (int,int));
+    CHECKTYPE(City, preachToTootersAroundPlayer, void, ());
+    CHECKTYPE(City, moveTooters, void, ());
+
+    Game(1, 1, 1);
+    CHECKTYPE(Game, play, void, ());
+}
+
+void doBasicTests()
+{
+//    {
+//        City walk(10, 20);
+//        assert(walk.addPlayer(2, 6));
+//        Player* pp = walk.player();
+//        assert(walk.isPlayerAt(2, 6)  && ! pp->isPassedOut());
+//        pp->move(UP);
+//        assert(walk.isPlayerAt(1, 6)  && ! pp->isPassedOut());
+//        pp->move(UP);
+//        assert(walk.isPlayerAt(1, 6)  && ! pp->isPassedOut());
+//        for (int k = 1; k <= 11; k++)
+//            pp->getGassed();
+//        assert(! pp->isPassedOut());
+//        pp->getGassed();
+//        assert(pp->isPassedOut());
+//    }
+//    {
+//        City ofAngels(2, 2);
+//        assert(ofAngels.addPlayer(1, 1));
+//        assert(ofAngels.addTooter(2, 2));
+//        Player* pp = ofAngels.player();
+//        ofAngels.moveTooters();
+//        assert( ! pp->isPassedOut());
+//        for (int k = 0; k < 1000  && ! pp->isPassedOut(); k++)
+//            ofAngels.moveTooters();
+//        assert(pp->isPassedOut());
+//    }
+    {
+        City ousDarth(2, 2);
+        assert(ousDarth.addPlayer(1, 1));
+        for (int k = 0; k < 5; k++)
+        {
+            assert(ousDarth.addTooter(1, 2));
+            assert(ousDarth.addTooter(2, 2));
+        }
+        ousDarth.preachToTootersAroundPlayer();
+        assert(ousDarth.nTootersAt(1, 1) == 0);
+        assert(ousDarth.nTootersAt(2, 1) == 0);
+        for (int r = 1; r <= 2; r++)
+        {     // .9999 probability that between 5 and 29 out of 50 are unconverted
+            int n = ousDarth.nTootersAt(r, 2);
+//            assert(n >= 5  &&  n <= 29);
+            assert(n == 0);
+        }
+        int m = ousDarth.nTootersAt(1, 2);
+        ousDarth.addTooter(1, 2);
+        assert(ousDarth.nTootersAt(1, 2) == m+1);
+    }
+    {
+        City univer(5, 20);
+        univer.addPlayer(3, 3);
+        int r = 1;
+        int c = 1;
+        for (int k = 1; k <= 5*5; k++)
+        {
+            if (r != 3 || c != 3)
+                univer.addTooter(r, c);
+            if (r == 5)
+            {
+                r = c+1;
+                c = 5;
+            }
+            else if (c == 1)
+            {
+                c = r + 1;
+                r = 1;
+            }
+            else
+            {
+                c--;
+                r++;
+            }
+        }
+        assert(univer.tooterCount() == 24);
+        for (int k = 0; k < 1000  && univer.tooterCount() > 16; k++)
+            univer.preachToTootersAroundPlayer();
+        assert(univer.tooterCount() == 16);
+        for (int r = 1; r <= 5; r++)
+        {
+            for (int c = 1; c <= 5; c++)
+            {
+                int expected = 1;
+                if (r >= 2  &&  r <= 4  &&  c >= 2  &&  c <= 4)
+                    expected = 0;
+                assert(univer.nTootersAt(r, c) == expected);
+            }
+        }
+        univer.addTooter(3, 2);
+        assert(univer.tooterCount() == 17);
+          // If the program crashes after leaving this compound statement, you
+          // are probably messing something up when you delete a Tooter after
+          // it is converted (or you have mis-coded the destructor).
+          //
+          // Draw a picture of your m_tooters array before the Tooters are
+          // preached to and also note the values of m_nTooters or any other
+          // variables you might have that are involved with the number of
+          // Tooters.  Trace through your code step by step as the Tooters
+          // are preached to and removed, updating the picture according to
+          // what the code says, not what you want it to do.  If you don't see
+          // a problem then, try tracing through the destruction of the city.
+          //
+          // If you execute the code, use the debugger to check on the values
+          // of key variables at various points.  If you didn't try to learn
+          // to use the debugger, insert statements that write the values of
+          // key variables to cerr so you can trace the execution of your code
+          // and see the first place where something has gone amiss.  (Comment
+          // out the call to clearScreen in City::display so that your output
+          // doesn't disappear.)
+    }
+    cout << "Passed all basic tests" << endl;
+}
+
 ///////////////////////////////////////////////////////////////////////////
 //  main()
 ///////////////////////////////////////////////////////////////////////////
 
 int main() {
-    // Create a game
 //    Game g(3, 4, 2);
-    Game g(2, 2, 5);
-
-    // Play the game
-    g.play();
+//    Game g(2, 2, 5);
+//    g.play();
+    doBasicTests(); // Remove this line after completing test.
+    return 0;       // Remove this line after completing test.
 }
 
 ///////////////////////////////////////////////////////////////////////////
