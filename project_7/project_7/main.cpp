@@ -420,7 +420,7 @@ void City::preachToTootersAroundPlayer() {
         //if orthogonally or diagonally adjacent
         if(abs(m_tooters[i]->row() - m_player->row()) <= 1 && abs(m_tooters[i]->col() - m_player->col()) <= 1) {
             // 2/3 chance to convert this tooter
-            if(true/*randInt(1,3) != 3*/) {
+            if(randInt(0,2) != 0) {
                 delete m_tooters[i];
                 m_nTooters--;
                 for(int j = i; j < m_nTooters; j++) {
@@ -595,36 +595,36 @@ void thisFunctionWillNeverBeCalled()
 
 void doBasicTests()
 {
-//    {
-//        City walk(10, 20);
-//        assert(walk.addPlayer(2, 6));
-//        Player* pp = walk.player();
-//        assert(walk.isPlayerAt(2, 6)  && ! pp->isPassedOut());
-//        pp->move(UP);
-//        assert(walk.isPlayerAt(1, 6)  && ! pp->isPassedOut());
-//        pp->move(UP);
-//        assert(walk.isPlayerAt(1, 6)  && ! pp->isPassedOut());
-//        for (int k = 1; k <= 11; k++)
-//            pp->getGassed();
-//        assert(! pp->isPassedOut());
-//        pp->getGassed();
-//        assert(pp->isPassedOut());
-//    }
-//    {
-//        City ofAngels(2, 2);
-//        assert(ofAngels.addPlayer(1, 1));
-//        assert(ofAngels.addTooter(2, 2));
-//        Player* pp = ofAngels.player();
-//        ofAngels.moveTooters();
-//        assert( ! pp->isPassedOut());
-//        for (int k = 0; k < 1000  && ! pp->isPassedOut(); k++)
-//            ofAngels.moveTooters();
-//        assert(pp->isPassedOut());
-//    }
+    {
+        City walk(10, 20);
+        assert(walk.addPlayer(2, 6));
+        Player* pp = walk.player();
+        assert(walk.isPlayerAt(2, 6)  && ! pp->isPassedOut());
+        pp->move(UP);
+        assert(walk.isPlayerAt(1, 6)  && ! pp->isPassedOut());
+        pp->move(UP);
+        assert(walk.isPlayerAt(1, 6)  && ! pp->isPassedOut());
+        for (int k = 1; k <= 11; k++)
+            pp->getGassed();
+        assert(! pp->isPassedOut());
+        pp->getGassed();
+        assert(pp->isPassedOut());
+    }
+    {
+        City ofAngels(2, 2);
+        assert(ofAngels.addPlayer(1, 1));
+        assert(ofAngels.addTooter(2, 2));
+        Player* pp = ofAngels.player();
+        ofAngels.moveTooters();
+        assert( ! pp->isPassedOut());
+        for (int k = 0; k < 1000  && ! pp->isPassedOut(); k++)
+            ofAngels.moveTooters();
+        assert(pp->isPassedOut());
+    }
     {
         City ousDarth(2, 2);
         assert(ousDarth.addPlayer(1, 1));
-        for (int k = 0; k < 5; k++)
+        for (int k = 0; k < 50; k++)
         {
             assert(ousDarth.addTooter(1, 2));
             assert(ousDarth.addTooter(2, 2));
@@ -635,8 +635,7 @@ void doBasicTests()
         for (int r = 1; r <= 2; r++)
         {     // .9999 probability that between 5 and 29 out of 50 are unconverted
             int n = ousDarth.nTootersAt(r, 2);
-//            assert(n >= 5  &&  n <= 29);
-            assert(n == 0);
+            assert(n >= 5  &&  n <= 29);
         }
         int m = ousDarth.nTootersAt(1, 2);
         ousDarth.addTooter(1, 2);
